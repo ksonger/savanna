@@ -113,10 +113,6 @@ Ext.define('Savanna.search.controller.SearchComponent', {
         var form = elem.findParentByType('search_searchcomponent').down('#search_form');
         form.queryById('search_terms').setValue('');
     },
-    clearSearch:function(elem)  {
-        var form = elem.findParentByType('search_searchcomponent').down('#search_form');
-        form.queryById('search_terms').setValue('');
-    },
 
     handleSearchTermKeyUp: function (field, evt) {
         if (evt.keyCode === 13) {
