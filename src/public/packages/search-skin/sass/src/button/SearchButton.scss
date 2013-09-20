@@ -1,0 +1,55 @@
+/*
+ *	@variables
+ */
+$js-ui: 'search-button';
+$ui-prefix: 'small-';
+$ui-suffix: '-toolbar-icon';
+$search-background-gradient: #ffffff, #e7e7e7;
+$search-background-gradient-hover: #959698, #e2e2e3;
+$search-button-padding: 2px 5px;
+
+/*
+ *	@logic
+ */
+@include extjs-button-ui(
+	$ui: $ui-prefix + $js-ui + $ui-suffix,
+
+	$border-radius: 0px,
+
+    $border-width: 0px,
+
+    $border-color: transparent,
+    $border-color-over: transparent,
+    $border-color-focus: transparent,
+    $border-color-pressed: transparent,
+    $border-color-disabled: transparent,
+    
+	$background-color: #fff,
+    $background-color-over: #fff,
+    $background-color-focus: #fff,
+    $background-color-pressed: #fff,
+    $background-color-disabled: #fff,
+
+    $background-gradient: $search-background-gradient,
+    $background-gradient-over: $search-background-gradient-hover,
+
+    $padding: $search-button-padding,
+
+	$color: $thetus-blue,
+    $color-over: $thetus-blue,
+    $color-focus: $thetus-blue,
+    $color-pressed: $thetus-blue,
+    $color-disabled: $thetus-blue,
+
+    $font-size: 11px,
+    $font-family: $Open-Sans-Normal,
+    $font-family-over: $Open-Sans-Normal,
+    $font-family-pressed: $Open-Sans-Normal,
+    
+    $icon-size: 11px,
+    $glyph-color: $gray-font
+);
+
+/*
+ *	@runtime
+ */

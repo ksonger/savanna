@@ -1,0 +1,26 @@
+/*
+ *	Imports
+ */
+@import 'DALFilters';
+@import 'DALGroups';
+@import 'FlatMenu';
+@import 'MapSearchPanel';
+@import 'AdvancedSearchPanel';
+
+// A.S. - This is to style the Top Search Bar background
+@import '../mixin-search-prime.scss';
+
+/*
+ *	Runtimes
+ */
+@include search-prime(
+    $panel-main-background: #333,
+    $panel-main-padding: 20px 0px,
+    $input-padding: 0px 10px,
+    $input-background: #fff,
+    $input-font-family: $Open-Sans-Normal,
+    $input-border: 1px solid #999999,
+    $button-color: #333,
+    $button-padding: 7px 4px,
+    $button-margin: 0px 3px 0px -2px
+);

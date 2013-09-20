@@ -1,0 +1,91 @@
+/*
+ *  IMPORTS
+ */
+@import '_thetus-button';
+@import 'FlatTab';
+@import 'Link';
+@import '../mixin-spacing-classes';
+@import 'SearchButton';
+@import 'CommitButton';
+
+/*
+ *  Runtime
+ */
+@include flat-tab();
+@include top-spacing();
+@include top-spacing(
+    $main-padding: 5px 0px 0px 0px
+);
+@include extjs-button-ui(
+	$ui: 'link-button-toolbar-small',
+
+    $border-radius: 0px,
+
+    $border-width: 0px,
+
+    $border-color: transparent,
+    $border-color-over: transparent,
+    $border-color-focus: transparent,
+    $border-color-pressed: transparent,
+    $border-color-disabled: transparent,
+	
+	$padding: 0 0 0 20px,
+    
+	$background-color: transparent,
+    $background-color-over: transparent,
+    $background-color-focus: transparent,
+    $background-color-pressed: transparent,
+    $background-color-disabled: transparent,
+
+    $color: #f1f1f1,
+    $color-over: #f1f1f1,
+    $color-focus: #f1f1f1,
+    $color-pressed: #ffffff,
+    $color-disabled: #747475,
+
+    $font-size: 14px,
+    $font-family: $Open-Sans-Bold,
+    $font-family-over: $Open-Sans-Bold,
+    $font-family-focus: $Open-Sans-Bold,
+    $font-family-pressed: $Open-Sans-Bold,
+    $font-family-disabled: $Open-Sans-Bold,
+    
+    $icon-size: 30px,
+    $glyph-color: #ffffff
+);
+@include extjs-button-ui(
+    $ui: 'search-button-small',
+    $border-radius: 0px,
+ 
+    $border-width: 0px,
+ 
+    $border-color: transparent,
+    $border-color-over: transparent,
+    $border-color-focus: transparent,
+    $border-color-pressed: transparent,
+    $border-color-disabled: transparent,
+    
+    $padding: 20px 10px,
+    
+    $background-color: transparent,
+    $background-color-over: transparent,
+    $background-color-focus: transparent,
+    $background-color-pressed: transparent,
+    $background-color-disabled: transparent,
+ 
+    $color: #ffffff,
+    $color-over: #ffffff,
+    $color-focus: #ffffff,
+    $color-pressed: #ffffff,
+    $color-disabled: #747475,
+ 
+    $font-size: 14px,
+    $font-family: $Open-Sans-Normal,
+    $font-family-over: $Open-Sans-Normal,
+    $font-family-focus: $Open-Sans-Normal,
+    $font-family-pressed: $Open-Sans-Normal,
+    $font-family-disabled: $Open-Sans-Normal,
+    
+    $icon-size: 10px,
+    $glyph-color: #333
+);

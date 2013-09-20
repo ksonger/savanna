@@ -1,0 +1,71 @@
+/*
+ * Flat Tab mixin
+ * Visually styles a tab to visually appear flat based off of a class (user defined)
+ */
+@mixin flat-tab(
+	$class: 'flat-tab',
+	$background: linear-gradient(top, #cfcece 0%, #ededed 30%),
+	
+	$tab-offset-padding: 8px 0 0 20px,
+	$tab-color: #fff,
+	$tab-font-weight: normal,
+	$tab-font-size: 10px,
+	$tab-border-radius: 0px,
+	$tab-width: 125px,
+	$tab-background: #424242,
+	$tab-border: 1px solid $tab-background,
+	$tab-padding: 2px 20px 4px,
+	
+	$tab-active-background: white,
+	$tab-active-color: #505050,
+	$tab-active-border: #989898
+){
+	.#{$class} {
+
+		// Background behind all tabs
+		.#{$prefix}tab-bar-default-top {
+			@include background($background);
+			padding: $tab-offset-padding;
+		}
+
+		// Tab text
+		.#{$prefix}tab-inner {
+			font-weight: $tab-font-weight;
+			font-size: $tab-font-size;
+			color: $tab-color;
+		}
+
+		// Default (all!) tab styles
+		.#{$prefix}tab-default-top {
+			@include box-shadow(none);
+			@include border-radius($tab-border-radius);
+			border: $tab-border;
+			border-bottom-color: $tab-background;
+			padding: $tab-padding;
+			color: $tab-color;
+			background: $tab-background;
+			min-width: $tab-width;
+
+			// Active only tabs
+			&-active {
+				background: $tab-active-background;
+				border: 1px solid $tab-active-border;
+				border-bottom: 1px solid $tab-active-background;
+
+				.#{$prefix}tab-inner {
+					color: $tab-active-color;
+				}
+			}
+		}
+
+		.#{$prefix}tab-bar-strip-default {
+			border: none;
+			border-top: 1px solid $tab-active-border;
+		}
+
+		.#{$prefix}panel-body {
+			border-color: transparent;
+			background: transparent;
+		}
+	}
+}

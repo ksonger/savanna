@@ -1,0 +1,1 @@
+This is where JsCover will put coverage tests, creating a directory for each browser (e.g. "phantom", "chrome", etc.)

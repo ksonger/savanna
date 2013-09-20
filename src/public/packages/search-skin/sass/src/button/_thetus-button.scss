@@ -1,0 +1,172 @@
+/*
+ *	Source file for creating button UI's
+ *
+ *	@author jgriffith
+ */
+
+ /*
+  *	@variables
+  */
+ @mixin thetus-button-ui(
+
+ 	// Standard Button UI Properties
+ 	$thetus-label,
+
+    $thetus-border-radius: 0px,
+
+    $thetus-border-width: 0px,
+
+    $thetus-border-color: none,
+    $thetus-border-color-over: none,
+    $thetus-border-color-focus: none,
+    $thetus-border-color-pressed: none,
+    $thetus-border-color-disabled: none,
+
+    $thetus-padding: null,
+    $thetus-text-padding: null,
+
+    $thetus-background-color: none,
+    $thetus-background-color-over: none,
+    $thetus-background-color-focus: none,
+    $thetus-background-color-pressed: none,
+    $thetus-background-color-disabled: none,
+
+    $thetus-background-gradient: null,
+    $thetus-background-gradient-over: null,
+    $thetus-background-gradient-focus: null,
+    $thetus-background-gradient-pressed: null,
+    $thetus-background-gradient-disabled: null,
+
+    $thetus-color: null,
+    $thetus-color-over: null,
+    $thetus-color-focus: null,
+    $thetus-color-pressed: null,
+    $thetus-color-disabled: null,
+
+    $thetus-font-size: null,
+    $thetus-font-size-over: null,
+    $thetus-font-size-focus: null,
+    $thetus-font-size-pressed: null,
+    $thetus-font-size-disabled: null,
+
+    $thetus-font-weight: null,
+    $thetus-font-weight-over: null,
+    $thetus-font-weight-focus: null,
+    $thetus-font-weight-pressed: null,
+    $thetus-font-weight-disabled: null,
+
+    $thetus-font-family: null,
+    $thetus-font-family-over: null,
+    $thetus-font-family-focus: null,
+    $thetus-font-family-pressed: null,
+    $thetus-font-family-disabled: null,
+
+    $thetus-icon-size: null,
+    $thetus-glyph-color: null,
+    $thetus-glyph-opacity: 1,
+    $thetus-arrow-width: null,
+    $thetus-arrow-height: null,
+    $thetus-split-width: null,
+    $thetus-split-height: null,
+    $thetus-include-ui-menu-arrows: $button-include-ui-menu-arrows,
+    $thetus-include-ui-split-arrows: $button-include-ui-split-arrows,
+    $thetus-include-split-noline-arrows: false,
+    $thetus-include-split-over-arrows: $button-include-split-over-arrows,
+    $thetus-opacity-disabled: 1,
+    $thetus-inner-opacity-disabled: 1,
+
+    // Thetus Custom UI properties
+    $thetus-box-shadow: null,
+    $thetus-box-shadow-over: null,
+    $thetus-box-shadow-pressed: null
+ ){
+ 	
+ 	/*
+ 	 *	@logic
+ 	 */
+
+ 	// Loading the default button UI
+ 	@include extjs-button-ui(
+	    $ui: $thetus-label,
+
+	    $border-radius: $thetus-border-radius,
+
+	    $border-width: $thetus-border-width,
+
+	    $border-color: $thetus-border-color,
+	    $border-color-over: $thetus-border-color-over,
+	    $border-color-focus: $thetus-border-color-focus,
+	    $border-color-pressed: $thetus-border-color-pressed,
+	    $border-color-disabled: $thetus-border-color-disabled,
+
+	    $padding: $thetus-padding,
+	    $text-padding: $thetus-text-padding,
+
+	    $background-color: $thetus-background-color,
+	    $background-color-over: $thetus-background-color-over,
+	    $background-color-focus: $thetus-background-color-focus,
+	    $background-color-pressed: $thetus-background-color-pressed,
+	    $background-color-disabled: $thetus-background-color-disabled,
+
+	    $background-gradient: $thetus-background-gradient,
+	    $background-gradient-over: $thetus-background-gradient-over,
+	    $background-gradient-focus: $thetus-background-gradient-focus,
+	    $background-gradient-pressed: $thetus-background-gradient-pressed,
+	    $background-gradient-disabled: $thetus-background-gradient-disabled,
+
+	    $color: $thetus-color,
+	    $color-over: $thetus-color-over,
+	    $color-focus: $thetus-color-focus,
+	    $color-pressed: $thetus-color-pressed,
+	    $color-disabled: $thetus-color-disabled,
+
+	    $font-size: $thetus-font-size,
+	    $font-size-over: $thetus-font-size-over,
+	    $font-size-focus: $thetus-font-size-focus,
+	    $font-size-pressed: $thetus-font-size-pressed,
+	    $font-size-disabled:$thetus-font-size-disabled,
+
+	    $font-weight: $thetus-font-weight,
+	    $font-weight-over: $thetus-font-weight-over,
+	    $font-weight-focus: $thetus-font-weight-focus,
+	    $font-weight-pressed: $thetus-font-weight-pressed,
+	    $font-weight-disabled: $thetus-font-weight-disabled,
+
+	    $font-family: $thetus-font-family,
+	    $font-family-over: $thetus-font-family-over,
+	    $font-family-focus: $thetus-font-family-focus,
+	    $font-family-pressed: $thetus-font-family-pressed,
+	    $font-family-disabled: $thetus-font-family-disabled,
+
+	    $icon-size: $thetus-icon-size,
+	    $glyph-color: $thetus-glyph-color,
+	    $glyph-opacity: $thetus-glyph-opacity,
+	    $arrow-width: $thetus-arrow-width,
+	    $arrow-height: $thetus-arrow-height,
+	    $split-width: $thetus-split-width,
+	    $split-height: $thetus-split-height,
+	    $include-ui-menu-arrows: $thetus-include-ui-menu-arrows,
+	    $include-ui-split-arrows: $thetus-include-ui-split-arrows,
+	    $include-split-noline-arrows: $thetus-include-split-noline-arrows,
+	    $include-split-over-arrows: $thetus-include-split-over-arrows,
+	    $opacity-disabled: $thetus-opacity-disabled,
+	    $inner-opacity-disabled: $thetus-inner-opacity-disabled
+ 	);
+
+	// Thetus custom logic
+	@if $thetus-box-shadow != null AND $thetus-box-shadow != 'none' {
+		.#{$prefix}btn-#{$thetus-label} {
+			@include box-shadow($thetus-box-shadow);
+		}
+	}
+	@if $thetus-box-shadow-over != null AND $thetus-box-shadow-over != 'none' {
+		.#{$prefix}btn-#{$thetus-label}-over {
+			@include box-shadow($thetus-box-shadow-over);
+		}
+	}
+	@if $thetus-box-shadow-pressed != null AND $thetus-box-shadow-pressed != 'none' {
+		.#{$prefix}btn-#{$thetus-label}-pressed {
+			@include box-shadow($thetus-box-shadow-pressed);
+		}
+	}
+}

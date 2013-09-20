@@ -1,0 +1,50 @@
+/*
+ *	Styles the DAL group sub-forms
+ *
+ *	@author astump(?)
+ */
+
+/*
+ *	@runtime
+ */
+.search-dal-group{
+	background-color: #ededef;
+	&:first-child {
+		@include single-box-shadow(#999, 0, 7px, 7px, -5px, inset);
+	}
+	&:last-child {
+
+		.#{$prefix}panel-header-default-top{
+			padding-bottom: 20px;			
+		}
+	}
+	.#{$prefix}panel-header-default{
+		background-image: none;
+		background: transparent;
+		border: none;
+	}
+	.#{$prefix}panel-header-default-top{
+		box-shadow: none;
+		margin-top: 15px;
+		padding-left: 18px;
+	}
+	.#{$prefix}panel-header-text{
+		font-family: $Open-Sans-Bold;
+		color: #333;
+		margin-left: 25px;
+	}
+	.#{$prefix}tool-default {
+		float: left;
+		left: 2px !important;
+	}
+	.#{$prefix}panel-body-default{
+		padding: 5px 0 5px 60px;
+	}
+	.#{$prefix}tool-expand-bottom{
+		background-position: 0 -75px;
+		@include rotate(-90deg);
+	}
+	.#{$prefix}tool-collapse-top{
+		background-position: 0 -75px;
+	}
+}

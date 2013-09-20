@@ -1,0 +1,320 @@
+{
+    "type": "crumbnet",
+    "uri": "publisher://authority/181475/Crumbnet",
+    "saveform": {
+        "nodes": [
+            {
+                "localId": "1",
+                "displayLabel": "Dogs",
+                "represents": "info://model/181537/Crumbnet/Concept",
+                "payload": {
+                    "crumbnet": {
+                        "yCoordinate": 57,
+                        "fillColor": null,
+                        "iconUrl": null,
+                        "elementWidths": 86,
+                        "elementHeight": 75,
+                        "xCoordinate": 323
+                    }
+                }
+            },
+            {
+                "localId": "2",
+                "displayLabel": "In the woods?",
+                "represents": "info://model/181568/Crumbnet/Question",
+                "payload": {
+                    "crumbnet": {
+                        "yCoordinate": 189,
+                        "fillColor": null,
+                        "iconUrl": null,
+                        "elementWidths": 117,
+                        "elementHeight": 65,
+                        "xCoordinate": 244
+                    }
+                }
+            },
+            {
+                "localId": "3",
+                "displayLabel": "Bears do",
+                "represents": "info://model/181599/Crumbnet/Fact",
+                "payload": {
+                    "crumbnet": {
+                        "yCoordinate": 299,
+                        "fillColor": null,
+                        "iconUrl": null,
+                        "elementWidths": 104,
+                        "elementHeight": 75,
+                        "xCoordinate": 513
+                    }
+                }
+            },
+            {
+                "localId": "4",
+                "displayLabel": "The pope doesn't",
+                "represents": "info://model/181630/Crumbnet/Fact",
+                "payload": {
+                    "crumbnet": {
+                        "yCoordinate": 439,
+                        "fillColor": null,
+                        "iconUrl": null,
+                        "elementWidths": 143,
+                        "elementHeight": 75,
+                        "xCoordinate": 495
+                    }
+                }
+            },
+            {
+                "localId": "5",
+                "displayLabel": "Dog",
+                "represents": "tcontent:SolrJdbc/Text/MediaWiki-Dog/NONE",
+                "payload": {
+                    "crumbnet": {
+                        "yCoordinate": 125,
+                        "fillColor": null,
+                        "iconUrl": null,
+                        "elementWidths": 71,
+                        "elementHeight": 65,
+                        "xCoordinate": 324
+                    }
+                }
+            },
+            {
+                "localId": "6",
+                "displayLabel": "However, this difference was not observed in all domestic dogs. Regurgitating of food by the fem...",
+                "represents": "tcontent:sav_enrichmentArtifactType_Snippet/980316002",
+                "payload": {
+                    "crumbnet": {
+                        "yCoordinate": 101,
+                        "fillColor": null,
+                        "iconUrl": null,
+                        "elementWidths": 348,
+                        "elementHeight": 65,
+                        "xCoordinate": 377
+                    }
+                }
+            },
+            {
+                "localId": "7",
+                "displayLabel": "1944 Chicago Bears season",
+                "represents": "tcontent:SolrJdbc/Text/f28c2123-fccd-4e56-99f4-e36b20ca7999/txt",
+                "payload": {
+                    "crumbnet": {
+                        "yCoordinate": 241,
+                        "fillColor": null,
+                        "iconUrl": null,
+                        "elementWidths": 179,
+                        "elementHeight": 65,
+                        "xCoordinate": 559
+                    }
+                }
+            },
+            {
+                "localId": "8",
+                "displayLabel": "BEAR!!!",
+                "represents": "tcontent:SolrJdbc/Image/91b179f3-9386-405a-9751-91dafa477852/jpg",
+                "payload": {
+                    "crumbnet": {
+                        "yCoordinate": 276,
+                        "fillColor": null,
+                        "iconUrl": null,
+                        "elementWidths": 85,
+                        "elementHeight": 65,
+                        "xCoordinate": 618
+                    }
+                }
+            },
+            {
+                "localId": "9",
+                "displayLabel": "Papal conclave, 1829",
+                "represents": "tcontent:SolrJdbc/Text/0718ec6c-8111-42be-a374-9320df4a1977/txt",
+                "payload": {
+                    "crumbnet": {
+                        "yCoordinate": 475,
+                        "fillColor": null,
+                        "iconUrl": null,
+                        "elementWidths": 149,
+                        "elementHeight": 65,
+                        "xCoordinate": 560
+                    }
+                }
+            },
+            {
+                "localId": "10",
+                "displayLabel": "Papal conclave, 1823",
+                "represents": "tcontent:SolrJdbc/Text/4db92904-b855-4469-9b97-52767a2944c8/txt",
+                "payload": {
+                    "crumbnet": {
+                        "yCoordinate": 535,
+                        "fillColor": null,
+                        "iconUrl": null,
+                        "elementWidths": 149,
+                        "elementHeight": 65,
+                        "xCoordinate": 560
+                    }
+                }
+            },
+            {
+                "localId": "11",
+                "displayLabel": "deforestation",
+                "represents": "info://model/182277/Crumbnet/Problem",
+                "payload": {
+                    "crumbnet": {
+                        "yCoordinate": 643,
+                        "fillColor": null,
+                        "iconUrl": null,
+                        "elementWidths": 115,
+                        "elementHeight": 65,
+                        "xCoordinate": 499
+                    }
+                }
+            },
+            {
+                "localId": "12",
+                "displayLabel": "Dogs Don't",
+                "represents": "info://model/182342/Crumbnet/Hypothesis",
+                "payload": {
+                    "crumbnet": {
+                        "yCoordinate": 415,
+                        "fillColor": null,
+                        "iconUrl": null,
+                        "elementWidths": 104,
+                        "elementHeight": 65,
+                        "xCoordinate": 264
+                    }
+                }
+            },
+            {
+                "localId": "13",
+                "displayLabel": "Axioms",
+                "represents": "info://model/182577/Crumbnet/Concept",
+                "payload": {
+                    "crumbnet": {
+                        "yCoordinate": 356,
+                        "fillColor": null,
+                        "iconUrl": null,
+                        "elementWidths": 87,
+                        "elementHeight": 65,
+                        "xCoordinate": 135
+                    }
+                }
+            }
+        ],
+        "edges": [
+            {
+                "localId": "14",
+                "from": "1",
+                "to": "2",
+                "directed": true,
+                "displayLabel": "Connects to",
+                "represents": "info://model/181769/Crumbnet/AnnotationTarget",
+                "payload": {
+                    "crumbnet": {}
+                }
+            },
+            {
+                "localId": "15",
+                "from": "1",
+                "to": "5",
+                "directed": true,
+                "represents": "info://model/181766/Crumbnet/AnnotationTarget",
+                "payload": {
+                    "crumbnet": {}
+                }
+            },
+            {
+                "localId": "16",
+                "from": "2",
+                "to": "12",
+                "directed": true,
+                "displayLabel": "Connects to",
+                "represents": "info://model/182375/Crumbnet/AnnotationTarget",
+                "payload": {
+                    "crumbnet": {}
+                }
+            },
+            {
+                "localId": "17",
+                "from": "3",
+                "to": "7",
+                "directed": true,
+                "represents": "info://model/182009/Crumbnet/AnnotationTarget",
+                "payload": {
+                    "crumbnet": {}
+                }
+            },
+            {
+                "localId": "18",
+                "from": "4",
+                "to": "9",
+                "directed": true,
+                "represents": "info://model/182153/Crumbnet/AnnotationTarget",
+                "payload": {
+                    "crumbnet": {}
+                }
+            },
+            {
+                "localId": "19",
+                "from": "5",
+                "to": "6",
+                "directed": true,
+                "represents": "info://model/181926/Crumbnet/AnnotationTarget",
+                "payload": {
+                    "crumbnet": {}
+                }
+            },
+            {
+                "localId": "20",
+                "from": "7",
+                "to": "8",
+                "directed": true,
+                "represents": "info://model/182098/Crumbnet/AnnotationTarget",
+                "payload": {
+                    "crumbnet": {}
+                }
+            },
+            {
+                "localId": "21",
+                "from": "9",
+                "to": "10",
+                "directed": true,
+                "represents": "info://model/182242/Crumbnet/AnnotationTarget",
+                "payload": {
+                    "crumbnet": {}
+                }
+            },
+            {
+                "localId": "22",
+                "from": "11",
+                "to": "12",
+                "directed": true,
+                "displayLabel": "Contradicts",
+                "represents": "info://model/182525/Crumbnet/AnnotationTarget",
+                "payload": {
+                    "crumbnet": {}
+                }
+            },
+            {
+                "localId": "23",
+                "from": "12",
+                "to": "3",
+                "directed": true,
+                "displayLabel": "Supports",
+                "represents": "info://model/182439/Crumbnet/AnnotationTarget",
+                "payload": {
+                    "crumbnet": {}
+                }
+            },
+            {
+                "localId": "24",
+                "from": "12",
+                "to": "4",
+                "directed": true,
+                "displayLabel": "Contradicts",
+                "represents": "info://model/182484/Crumbnet/AnnotationTarget",
+                "payload": {
+                    "crumbnet": {}
+                }
+            }
+        ]
+    }
+}

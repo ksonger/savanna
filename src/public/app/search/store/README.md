@@ -1,0 +1,1 @@
+This is where you will create your Ext Stores.  There is no Sencha Cmd to auto-generate this, so you will have to create it by hand.

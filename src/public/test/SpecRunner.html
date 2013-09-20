@@ -1,0 +1,118 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Jasmine Test Runner</title>
+
+    <link rel="stylesheet" type="text/css" href="lib/jasmine-1.3.1/jasmine.css">
+
+    <!-- Jasmine libs -->
+    <script type="text/javascript" src="lib/jasmine-1.3.1/jasmine.js"></script>
+    <script type="text/javascript" src="lib/jasmine-1.3.1/jasmine-html.js"></script>
+    <script type="text/javascript" src="lib/jasmine-reporters/jasmine.phantomjs-reporter.js"></script>
+    <script type="text/javascript" src="lib/sinon-1.7.1.js"></script>
+
+    <!-- ExtJS -->
+
+    <link rel="stylesheet" href="../bootstrap.css">
+    <script src="../ext/ext-all-debug.js"></script>
+    <!--<script src="../bootstrap.js"></script>
+    <script type="text/javascript" src="../ext/ext-all-debug.js"></script>-->
+
+    <!-- Thetus test helpers (and dependencies) -->
+    <script type="text/javascript" src="lib/underscore.js"></script>
+    <script type="text/javascript" src="helpers/FakeServer.js"></script>
+    <script type="text/javascript" src="helpers/ExtInitializer.js"></script>
+    <script type="text/javascript" src="helpers/ExtHelpers.js"></script>
+
+    <!-- Crumbnet -->
+    <script type="text/javascript" src="../resources/GoJS/release/go-debug.js"></script>
+
+    <!-- Flexpaper -->
+    <script type="text/javascript" src="../resources/flexpaper/js/jquery.min.js"></script>
+    <script type="text/javascript" src="../resources/flexpaper/js/jquery.extensions.min.js"></script>
+    <link rel="stylesheet" href="../resources/flexpaper/css/flexpaper.css"/>
+    <script type="text/javascript" src="../resources/flexpaper/js/flexpaper.js"></script>
+    <script type="text/javascript" src="../resources/flexpaper/js/flexpaper_handlers.js"></script>
+
+    <!-- Leaflet -->
+    <script type="text/javascript" src="../resources/Leaflet/leaflet.js"></script>
+    <link rel="stylesheet" href="../resources/Leaflet/leaflet.draw.css" />
+    <script type="text/javascript" src="../resources/Leaflet/leaflet.draw-src.js"></script>
+    <link rel="stylesheet" href="../resources/Leaflet/L.Control.Zoomslider.css" />
+    <script type="text/javascript" src="../resources/Leaflet/L.Control.Zoomslider.js"></script>
+
+    <!-- Map -->
+    <script src="http://openlayers.org/api/2.12-rc3/OpenLayers.js"></script>
+
+    <!-- include fixture files here... -->
+    <!--<script type="text/javascript" src="fixtures/SOME_FIXTURE_FILE.js"></script>-->
+    <script type="text/javascript" src="fixtures/DalSources.js"></script>
+    <script type="text/javascript" src="fixtures/Crumbnet.js"></script>
+    <script type="text/javascript" src="fixtures/SearchResults.js"></script>
+    <script type="text/javascript" src="fixtures/HistoryResults.js"></script>
+    <script type="text/javascript" src="fixtures/LocationSources.js"></script>
+    <script type="text/javascript" src="fixtures/FacetModels.js"></script>
+
+
+    <!-- Insert tests here, note that node is regexing the parse comments below so do not change them -->
+    <!--[#parserstart]-->
+    <script type="text/javascript" src="specs/SavannaConfigSpec.js"></script>
+    <script type="text/javascript" src="specs/MainSpec.js"></script>
+    <script type="text/javascript" src="specs/ControllerFactorySpec.js"></script>
+    <script type="text/javascript" src="specs/StoreableMixinSpec.js"></script>
+    <script type="text/javascript" src="specs/CorsProxySpec.js"></script>
+    <script type="text/javascript" src="specs/PrintModalSpec.js"></script>
+    <script type="text/javascript" src="specs/DalSearchSpec.js"></script>
+    <script type="text/javascript" src="specs/ExtendedLinkSpec.js"></script>
+    <script type="text/javascript" src="specs/CrumbnetSpec.js"></script>
+    <script type="text/javascript" src="specs/SearchComponentSpec.js"></script>
+    <script type="text/javascript" src="specs/ResultsComponentSpec.js"></script>
+    <script type="text/javascript" src="specs/LeafletSpec.js"></script>
+    <script type="text/javascript" src="specs/LocationSearchSpec.js"></script>
+    <script type="text/javascript" src="specs/DesktopSpec.js"></script>
+    <!--[#parserend]-->
+</head>
+<body>
+
+<script type="text/javascript">
+    (function() {
+        var jasmineEnv = jasmine.getEnv();
+        jasmineEnv.updateInterval = 1000;
+
+        var reporter = new jasmine.HtmlReporter();
+
+        jasmineEnv.addReporter(reporter);
+
+        // only add the phantomjs reporter if we are in phantomjs...
+        if (window.navigator.userAgent.match(/PhantomJS/) && jasmine.PhantomJSReporter) {
+            jasmineEnv.addReporter(new jasmine.PhantomJSReporter());
+        }
+
+        if (reporter.specFilter) {
+            jasmineEnv.specFilter = function(spec) {
+                return reporter.specFilter(spec);
+            };
+        }
+
+        var currentWindowOnload = window.onload;
+
+        window.onload = function() {
+            if (currentWindowOnload) {
+                currentWindowOnload();
+            }
+
+            var origErrorHandler = Ext.Error.handle;
+            Ext.Error.handle = function() {
+                origErrorHandler.apply(this, arguments);
+                return true;
+            };
+
+            Ext.onReady(function() {
+                jasmineEnv.execute();
+            });
+        };
+    })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+/*
+ *	@variables
+ */
+$js-ui: 'search-map';
+$component-type: 'tabpanel-child';
+$map-panel-padding: 20px;
+
+/*
+ *	@Runtime
+ */
+.#{$prefix + $component-type}.#{$js-ui} {
+	padding: 10px;
+}

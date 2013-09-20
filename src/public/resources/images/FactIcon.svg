@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="100px" height="100px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve" xmlns:xml="http://www.w3.org/XML/1998/namespace">
+<g transform='scale(4.18,4.18)'>
+	<radialGradient id="grad1" cx="50%" cy="50%" r="50%" >
+    	<stop offset="0" style="stop-color:#16B540" />
+     	<stop offset="1" style="stop-color:#139C37" />
+    </radialGradient>
+    <clipPath id="circle-shape">
+	  <circle cx="12" cy="12" r="12" /> 
+	</clipPath>
+	<clipPath id="recStar-shape">
+		<rect x="11.2" y="4.3" width="2.3" height="15.8" fill="#fff" />
+		<rect x="11.2" y="4.2" width="2.3" height="16" fill="#fff" transform="rotate(-90 12 12)" />
+		<rect x="11.2" y="4.2" width="2.3" height="16" fill="#fff" transform="rotate(-45 12 12)" />
+		<rect x="11.2" y="4.1" width="2.3" height="16" fill="#fff" transform="rotate(45 12 12)" />
+	</clipPath>
+	<clipPath id="recStar-shapeShadow">
+		<rect x="10.9" y="4" width="2.5" height="15.8" fill="#fff" />
+		<rect x="10.9" y="3.9" width="2.5" height="16" fill="#fff" transform="rotate(-90 12 12)" />
+		<rect x="10.9" y="3.9" width="2.5" height="16" fill="#fff" transform="rotate(-45 12 12)" />
+		<rect x="10.9" y="3.8" width="2.5" height="16" fill="#fff" transform="rotate(45 12 12)" />
+	</clipPath>
+    <circle cx="12" cy="12" r="12" fill="url(#grad1)" /> 
+    <circle cx="12" cy="12" r="9" fill="#7f7f7f"  clip-path="url(#recStar-shapeShadow)"  />
+    <ellipse cx="12" cy="12.3" rx="8.99" ry="8.78" fill="#F2F2F2" clip-path="url(#recStar-shape)" />
+
+	<circle cx="12" cy="12" r="1.5" fill="url(#grad1)" /> 
+    <ellipse opacity="0.3" cx="12" cy="1.9" rx="17" ry="12.5" fill="#FFF"  clip-path="url(#circle-shape)" />
+</g>
+</svg>

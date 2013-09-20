@@ -1,0 +1,39 @@
+/*
+ *	Private Variables
+ */
+$js-ui: 'flat-menu';
+$ui-suffix: '';
+
+/*
+ *	Logic
+ */
+@include extjs-panel-ui(
+	$ui-label: $js-ui + $ui-suffix,
+	$ui-body-background-color: #fff,
+	$ui-body-border-color: $gray-border
+);
+
+/*
+ *	Runtime
+ */
+.#{$prefix + 'panel-' + $js-ui}{
+
+	.#{$prefix}menu-item {
+
+		.#{$prefix}menu-item-link {
+			padding: 2px;
+			width: 100%;
+		}
+
+		// :hover
+		&.#{$prefix}menu-item-active {
+			
+			.#{$prefix}menu-item-link {
+				background: $item-hover;
+			}	
+		}
+	}
+	.#{$prefix}menu-icon-separator {
+		display: none;
+	}
+}

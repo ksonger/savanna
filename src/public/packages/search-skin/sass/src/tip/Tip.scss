@@ -1,0 +1,23 @@
+@import '_thetus-tooltip.scss';
+@include thetus-tooltip(
+    $thetus-label: $tip-ui-label,
+    $thetus-tip-width: $tip-width,
+
+    //text
+    $thetus-body-color: $tip-body-color,
+    $thetus-font-size: $tip-body-font-size,
+
+    //borders,
+    $thetus-border-color: $tip-border-color,
+    $thetus-border-width: $tip-border-width,
+    $thetus-border-radius: $tip-border-radius,
+    
+    //shadows,
+    $thetus-body-shadow: $tip-body-shadow,
+    $thetus-shadow-h-offset: $tip-body-shadow-h-offset,
+    $thetus-shadow-v-offset: $tip-body-shadow-v-offset,
+    $thetus-shadow-blur: $tip-body-shadow-blur,
+    $thetus-shadow-spread: $tip-body-shadow-spread,
+   
+    $thetus-tool-background-image: $tip-tool-background-image
+);

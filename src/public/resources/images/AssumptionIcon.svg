@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="100px" height="100px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve" xmlns:xml="http://www.w3.org/XML/1998/namespace">
+<g transform='scale(4.18,4.18)'>
+   <defs>
+    <radialGradient id="grad1" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <stop offset="0%" style="stop-color:#fff;stop-opacity:0.0" />
+      <stop offset="100%" style="stop-color:#000;stop-opacity:0.2" />
+    </radialGradient>
+  </defs>
+    <clipPath id="circle-shape">
+	  <circle cx="12" cy="12" r="12" /> 
+	</clipPath>
+    <circle cx="12" cy="12" r="12" fill="url(#grad1)" /> 
+    <circle cx="12" cy="12" r="9" fill="#7f7f7f" />
+    <ellipse cx="12" cy="12.3" rx="8.99" ry="8.78" fill="#F2F2F2" />
+	
+     <ellipse opacity="0.3" cx="12" cy="1.9" rx="17" ry="12.5" fill="#FFF"  clip-path="url(#circle-shape)" />
+</g>
+</svg>
