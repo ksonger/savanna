@@ -1,2 +1,0 @@
-# search-skin - Read Me
-

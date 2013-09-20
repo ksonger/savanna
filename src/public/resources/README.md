@@ -1,1 +1,0 @@
-This should be where your theme resources will be placed after building your app (via "sencha app build")

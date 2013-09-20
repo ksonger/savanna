@@ -1,2 +1,0 @@
-# Helpful SASS compile (use this in the package/build directory), outputs a source map which some browsers can use
-sass --compass --sourcemap search-skin-all-debug.scss:resources/search-skin-all.css

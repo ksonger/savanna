@@ -1,9 +1,0 @@
-<project name="HTML5 Savanna Client">
-<body>
-    <menu name="Module Documentation" inherit="top">
-        <item name="Reports" href="project-reports.html" />
-        <item name="Surefire Report" href="surefire-report.html" />
-        <item name="JSCover Report" href="jscover/jscoverage.html" />
-    </menu>
-</body>
-</project>
