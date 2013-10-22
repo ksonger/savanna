@@ -25,7 +25,6 @@ Ext.define('Savanna.search.view.SearchComponent', {
     closable:false,
     border:false,
 
-    firstResultsReturned:false,
 
     items: [
         {
@@ -48,6 +47,9 @@ Ext.define('Savanna.search.view.SearchComponent', {
     ],
 
     initComponent: function () {
+
+        this.refineSearchString = '';
+
         this.callParent(arguments);
 
         Savanna.controller.Factory.getController('Savanna.search.controller.SearchComponent');

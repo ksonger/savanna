@@ -12,12 +12,10 @@ Ext.define('Savanna.search.view.searchComponent.SearchToolbar', {
             xtype: 'tbfill'
         },
         {
-            glyph: 61786,
-            ui: 'flat-toolbar-button'
+            glyph: 61786
         },
         {
-            glyph: 61746,
-            ui: 'flat-toolbar-button'
+            glyph: 61746
         }
     ]
 

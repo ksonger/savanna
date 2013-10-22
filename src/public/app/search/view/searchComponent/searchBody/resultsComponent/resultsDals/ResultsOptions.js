@@ -4,8 +4,13 @@ Ext.define('Savanna.search.view.searchComponent.searchBody.resultsComponent.resu
 
     requires: [
         'Ext.form.field.Checkbox',
-        'Ext.draw.Text'
+        'Ext.draw.Text',
+        'Savanna.search.controller.resultsComponent.resultsDals.ResultsOptionsController'
     ],
+
+    bubbleEvents: ['search:changeSelectedStore'],
+
+    controller: 'Savanna.search.controller.resultsComponent.resultsDals.ResultsOptionsController',
 
     header: false,
 

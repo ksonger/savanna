@@ -70,20 +70,16 @@ Ext.define('Savanna.search.view.searchComponent.SearchBody', {
     dockedItems: [
         {
             xtype: 'toolbar',
-            ui: 'link-toolbar',
             width: '100%',
             itemId: 'searchbodytoolbar',
-            border: false,
             items: [
                 {
                     xtype: 'button',
-                    ui: 'link-button',
                     text: 'Search Options',
                     itemId: 'optionsbutton'
                 },
                 {
                     xtype: 'button',
-                    ui: 'link-button',
                     text: 'Results',
                     itemId: 'resultsbutton'
                 }
@@ -94,6 +90,8 @@ Ext.define('Savanna.search.view.searchComponent.SearchBody', {
         '->',
         {
             xtype: 'button',
+            ui: 'commit',
+            scale: 'large',
             text: 'Search',
             itemId: 'toolbarsearchbutton'
         }

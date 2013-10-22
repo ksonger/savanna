@@ -1,11 +1,13 @@
 Ext.define('Savanna.search.view.searchComponent.searchBody.resultsComponent.ResultsPanelToolbar', {
     extend: 'Ext.toolbar.Toolbar',
     alias: 'widget.search_resultspaneltoolbar',
-
+    controller: 'Savanna.search.controller.resultsComponent.ResultsPanelToolbarController',
+    bubbleEvents: ['Search:PageSizeChanged', "Search:SortByChanged"],
     requires: [
         'Savanna.controller.Factory',
         'Ext.form.field.ComboBox',
-        'Ext.data.Store'
+        'Ext.data.Store',
+        'Savanna.search.controller.resultsComponent.ResultsPanelToolbarController'
     ],
 
     initComponent: function () {
@@ -19,65 +21,47 @@ Ext.define('Savanna.search.view.searchComponent.searchBody.resultsComponent.Resu
         var sortStore = Ext.create('Ext.data.Store', {
             fields: ['sortby', 'name'],
             data: [
-                {'sortby': 'relevance', 'name': 'Relevance'}
+                {'sortby': 'relevance', 'name': 'Sort by Relevance'}
             ]
         });
 
         var countStore = Ext.create('Ext.data.Store', {
             fields: ['count', 'name'],
             data: [
-                {'count': '20', 'name': '20'},
-                {'count': '50', 'name': '50'},
-                {'count': '100', 'name': '100'}
+                {'count': 20, 'name': '20 results per page'},
+                {'count': 50, 'name': '50 results per page'},
+                {'count': 100, 'name': '100 results per page'}
             ]
         });
 
-        return [
-            {
-                xtype: 'tbtext',
-                text: 'Sort by:',
-                itemId: 'sortby_combobox_label'
-            },
-            {
+        return [{
                 xtype: 'combobox',
                 itemId: 'resultsSortByCombobox',
                 store: sortStore,
                 displayField: 'name',
                 valueField: 'sortby',
-                value: 'relevance'
-
-            },
-            {
-                xtype: 'tbtext',
-                text: 'Results Per Page:',
-                itemId: 'pagesize_combobox_label'
-            },
-            {
+                value: 'relevance',
+                editable: false,
+                ui: 'combo-button'
+            }, {
                 xtype: 'combobox',
                 itemId: 'resultsPageSizeCombobox',
                 store: countStore,
                 displayField: 'name',
                 valueField: 'count',
-                value: '20'
+                value: 'Results per page',
+                editable: false,
+                ui: 'combo-button'
 
-            },
-            {
+            }, {
                 xtype: 'tbfill'
-            },
-
-            {
-                text:'Imgs',
-                ui: 'flat-toolbar-button'
-            },
-            {
-                text:'List',
-                ui: 'flat-toolbar-button'
-            },
-            {
-                text:'Map',
-                ui: 'flat-toolbar-button'
-            }
-        ]
+            }, {
+                text:'Imgs'
+            }, {
+                text:'List'
+            }, {
+                text:'Map'
+        }]
     }
 
 });

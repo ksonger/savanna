@@ -8,6 +8,7 @@
 Ext.define('Savanna.search.view.searchComponent.searchBody.ResultsComponent', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.search_resultscomponent',
+    bubbleEvents: ['Search:PageSizeChanged', "Search:SortByChanged", 'search:changeSelectedStore'],
     requires: [
         'Savanna.search.view.searchComponent.searchBody.resultsComponent.ResultsDals',
         'Savanna.search.view.searchComponent.searchBody.resultsComponent.ResultsPanel',
@@ -19,6 +20,7 @@ Ext.define('Savanna.search.view.searchComponent.searchBody.ResultsComponent', {
     layout: 'border',
     defaults: {
         // is collapsible good?  seemed handy.
+        titleCollapse: true,
         collapsible: true,
         split: true
     },
@@ -32,7 +34,9 @@ Ext.define('Savanna.search.view.searchComponent.searchBody.ResultsComponent', {
     items: [
         {
             xtype: 'search_resultsdals',
-            itemId: 'resultsdals'
+            itemId: 'resultsdals',
+            split: false,
+            collapseMode: 'header'
         },
         {
             xtype: 'search_resultspanel',

@@ -4,7 +4,6 @@ Ext.define('Savanna.search.store.DalSources', {
 
     requires: [
         'Ext.data.proxy.Rest',
-        'Savanna.Config',
         'Savanna.proxy.Cors'
     ],
 
@@ -34,7 +33,7 @@ Ext.define('Savanna.search.store.DalSources', {
 
         this.setProxy({
             type: 'savanna-cors',
-            url: Savanna.Config.buildSavannaUrl('dalSourcesUrl'),
+            url: SavannaConfig.dalSourcesUrl,
             // Turn off the paging params...
             startParam: undefined,
             limitParam: undefined,

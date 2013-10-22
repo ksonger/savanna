@@ -1,4 +1,4 @@
-/* global Ext: false, Savanna: false */
+/* global Ext: false*/
 Ext.define('Savanna.search.view.searchComponent.SearchBar', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.search_searchbar',
@@ -32,6 +32,7 @@ Ext.define('Savanna.search.view.searchComponent.SearchBar', {
                     border: false,
                     bodyPadding: 0,
                     itemId:'search_reset',
+                    minHeight:25,
                     items: [
                         {
                             xtype: 'button',
@@ -53,9 +54,9 @@ Ext.define('Savanna.search.view.searchComponent.SearchBar', {
             advancedBooleanString = '',
             formQueryString,
             form = this.queryById('search_form'),
-            formField = form.queryById('form_container');
+            formContainer = form.queryById('searchadvanced_menu').queryById('form_container');
 
-        Ext.Array.each(formField.query('searchadvanced_textfield'), function (field) {
+        Ext.Array.each(formContainer.query('searchadvanced_textfield'), function (field) {
             var value = field.getValue().trim();
 
             if (field.xtype === 'searchadvanced_textfield' && value !== '' && value !== undefined) {
@@ -84,6 +85,12 @@ Ext.define('Savanna.search.view.searchComponent.SearchBar', {
                 searchString = formQueryString;
             }
         }
+
+        /*
+        lastly, if the user has specified terms to refine the search in the results screen,
+        add them to the beginning of the searchString
+         */
+        searchString  =  this.findParentByType('search_searchcomponent').refineSearchString + searchString;
 
         return searchString;
     }
