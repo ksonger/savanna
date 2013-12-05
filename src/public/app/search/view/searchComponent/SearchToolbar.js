@@ -10,13 +10,15 @@ Ext.define('Savanna.search.view.searchComponent.SearchToolbar', {
     items: [
         {
             xtype: 'tbfill'
-        },
+        }
+        /* help and mystuff are not in this release
+        ,
         {
             glyph: 61786
         },
         {
             glyph: 61746
-        }
+        } */
     ]
 
 });

@@ -18,11 +18,11 @@ Ext.define('Savanna.search.view.searchComponent.searchBody.resultsComponent.Resu
 
     region: 'center',
     header: false,
-    layout:'fit',
+    layout: 'fit',
 
 
     initComponent: function () {
-        Savanna.controller.Factory.getController('Savanna.search.controller.ResultsComponent');
+        //Savanna.controller.Factory.getController('Savanna.search.controller.ResultsComponent');
         this.items = this.setupItems();
         this.callParent(arguments);
     },
@@ -31,15 +31,7 @@ Ext.define('Savanna.search.view.searchComponent.searchBody.resultsComponent.Resu
         return [
             {
                 xtype: 'search_resultspanelgrid',
-                itemId: 'resultspanelgrid',
-                dockedItems:[
-                    {
-                        xtype: 'pagingtoolbar',
-                        itemId: 'gridtoolbar',
-                        dock: 'top',
-                        displayInfo: true
-                    }
-                ]
+                itemId: 'resultspanelgrid'
             },
             {
                 xtype: 'search_resultsmap',
@@ -55,10 +47,22 @@ Ext.define('Savanna.search.view.searchComponent.searchBody.resultsComponent.Resu
      */
     updateGridStore: function (obj) {
         var grid = this.queryById('resultspanelgrid');
-        grid.reconfigure(obj.store);
-        grid.queryById('gridtoolbar').bindStore(obj.store);
+        //only do the rebinding if the store actually changed
+        if (!grid.store.valid || (obj.store.storeId !== grid.store.storeId)) {
+            grid.reconfigure(obj.store);
+            this.queryById('gridtoolbar').bindStore(obj.store);
 
-        obj.store.loadPage(obj.store.currentPage);
+            obj.store.loadPage(obj.store.currentPage);
+        }
+    },
+
+    clearGridStore: function () {
+        var grid = this.queryById('resultspanelgrid');
+        //I tried using gridtoolbar.bindStore() to unbind the current store and reset the paging toolbar, but didn't work
+        grid.store.removeAll();
+        grid.store.totalCount = 0;
+        this.queryById('gridtoolbar').onLoad();
+        grid.store.valid = false;
     },
 
     dockedItems: [

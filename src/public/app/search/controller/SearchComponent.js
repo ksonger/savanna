@@ -14,7 +14,6 @@ Ext.define('Savanna.search.controller.SearchComponent', {
         'Savanna.search.store.SearchResults',
         'Savanna.search.view.searchComponent.searchBody.searchMap.SearchLocationComboBox',
         'Savanna.controller.Factory',
-        'Savanna.metadata.store.Metadata',
         'Savanna.search.model.ResultMetadata',
         'Savanna.search.store.ResultsMetadata'
     ],
@@ -28,9 +27,16 @@ Ext.define('Savanna.search.controller.SearchComponent', {
 
     init: function () {
         var me = this;
+
+        this.callId = 0; //used by the callback
+
         this.control({
             'search_searchcomponent': {
-                render: this.onSearchRender
+                render: this.onSearchRender,
+                afterrender: this.afterRender
+            },
+            'search_searchcomponent #toolbarsearchbutton': {
+                click: this.handleSearchSubmit
             },
             'search_searchcomponent #search_reset_button': {
                 click: this.handleNewSearch
@@ -39,9 +45,8 @@ Ext.define('Savanna.search.controller.SearchComponent', {
                 click: this.showHideMenu
             },
             'search_searchcomponent #search_terms': {
-                keyup: this.handleSearchTermKeyUp,
                 'onsearchclick': this.handleSearchSubmit,
-                'onclearclick' : this.clearSearch
+                'onclearclick' : this.clearAdvancedSearch
             },
             'search_searchcomponent #searchadvanced_menu textfield': {
                 keyup: this.handleSearchTermKeyUp
@@ -50,25 +55,21 @@ Ext.define('Savanna.search.controller.SearchComponent', {
                 click: this.handleSearchSubmit
             },
             'search_searchcomponent #search_clear': {
-                click: this.clearSearch
-            },
-            'search_searchcomponent #advancedsearch_submit': {
-                click: this.handleSearchSubmit
+                click: this.clearAdvancedSearch
             },
             'search_searchcomponent #searchadvanced_menu': {
                 render: function (menu) {
-                    menu.queryById('close_panel').on('click', this.handleClose);
-                    menu.queryById('advancedsearch_submit').on('click', me.handleSearchSubmit, me);
+                    menu.queryById('close_panel').on('click', me.handleClose);
+                    menu.queryById('advancedsearch_submit').on('click', me.handleAdvancedSearchSubmit, me);
                 }
             },
-            'search_searchcomponent #optionsbutton': {
+            'search_searchcomponent #searchDalsButton': {
                 click: this.onBodyToolbarClick
             },
-            'search_searchcomponent #resultsbutton': {
+            'search_searchcomponent #searchMapButton': {
                 click: this.onBodyToolbarClick
             },
             'search_searchcomponent #searchMapCanvas': {
-                beforerender: this.loadDefaultLayer,
                 afterrender: this.loadVectorLayer,
                 resize: this.onMapCanvasResize
             },
@@ -110,16 +111,16 @@ Ext.define('Savanna.search.controller.SearchComponent', {
 
     onSearchRender: function (search) {
         if (search.up('desktop_searchwindow')) {
-            var advanced_menu = search.down('#searchadvanced_menu');
+            var advancedMenu = search.down('#searchadvanced_menu');
 
             search.up('desktop_searchwindow').header.getEl().on('mousedown', function () {
-                advanced_menu.wasOpen = advanced_menu.isVisible();
-                advanced_menu.hide();
+                advancedMenu.wasOpen = advancedMenu.isVisible();
+                advancedMenu.hide();
             });
 
             search.up('desktop_searchwindow').on('move', function (win) {
-                if (advanced_menu.wasOpen) {
-                    advanced_menu.showBy(win.down('#search_form'));
+                if (advancedMenu.wasOpen) {
+                    advancedMenu.showBy(win.down('#search_form'));
                 }
             });
         }
@@ -129,12 +130,17 @@ Ext.define('Savanna.search.controller.SearchComponent', {
         search.down('#search_reset_button').setVisible(false);
     },
 
+    afterRender: function (search) {
+        search.down('search_searchbody').setActiveTab('searchresults');
+        search.down('search_searchbody').setActiveTab('mainsearchoptions');
+    },
+
     handleNewSearch: function (elem) {
         var component = this.getSearchComponent(elem);
 
         if (component.down('search_resultsDals_resultsterms')) {   // doesn't exist if results page has not yet been created
 
-            component.down('search_resultsDals_resultsterms').queryById('termValues').removeAll();  // remove refine terms in results screen
+            component.down('search_resultsDals_resultsterms').removeAll();  // remove refine terms in results screen
         }
 
         var form = component.down('#search_form'),
@@ -185,24 +191,38 @@ Ext.define('Savanna.search.controller.SearchComponent', {
          return to the options screen if we're not already there
          */
 
-        if (component.down('#searchbody').currentPanel !== 'searchoptions') {
-            var optionsBtn = component.queryById('optionsbutton');
-            optionsBtn.fireEvent('click', optionsBtn);
+        if (component.down('#searchbody').activeTab !== 'mainsearchoptions') {
+            component.down('search_searchbody').setActiveTab('mainsearchoptions');
         }
 
         /*
          clear the grid - it's misleading in error states to see results in the grid, even though
          the search request has failed for one reason or another
          */
-        component.down('#resultspanel').updateGridStore({store: Ext.create('Savanna.search.store.SearchResults')});
+        component.down('#resultspanel').clearGridStore();
 
         /*
          hide Start New Search button
          */
         component.down('#search_reset_button').setVisible(false);
+
+        // Clear Map: Search Results and  location search polygon
+        //search options > location is in a tab so check if it exists
+        if (component.down('#searchMapCanvas').searchLayer){
+            component.down('#searchMapCanvas').searchLayer.removeAllFeatures();
+        }
+
+        //clear result layer
+        if (component.down('#resultMapCanvas').resultsLayer){
+            component.down('#resultMapCanvas').resultsLayer.removeAllFeatures();
+            component.fireEvent('clearPopUpOnNewSearch', event, component.down('search_resultscomponent'));
+        }
+
+        //lastly, set focus to the empty search terms box
+        searchBar.queryById('search_terms').focus(false, 100);
     },
 
-    clearSearch: function (elem) {
+    clearAdvancedSearch: function (elem) {
         var form = elem.findParentByType('search_searchcomponent').down('#searchbar');
 
         var formField = form.queryById('searchadvanced_menu').queryById('form_container');
@@ -212,7 +232,6 @@ Ext.define('Savanna.search.controller.SearchComponent', {
                 field.setValue('');
             }
         });
-
     },
 
     resetCustomSearchOptions:function(component) {
@@ -222,6 +241,11 @@ Ext.define('Savanna.search.controller.SearchComponent', {
     },
 
     handleSearchSubmit: function (btn) {
+        this.clearAdvancedSearch(btn);
+        this.doSearch(btn);
+    },
+
+    handleAdvancedSearchSubmit: function (btn) {
         this.doSearch(btn);
     },
 
@@ -240,33 +264,27 @@ Ext.define('Savanna.search.controller.SearchComponent', {
     },
 
     showHideMenu: function (btn) {
-        var adv_menu = btn.findParentByType('search_searchcomponent').down('#searchadvanced_menu');
+        var advMenu = btn.findParentByType('search_searchcomponent').down('#searchadvanced_menu');
 
-        if (adv_menu.isVisible()) {
-            adv_menu.hide();
+        if (advMenu.isVisible()) {
+            advMenu.hide();
         } else {
-            adv_menu.showBy(btn.up('#search_form'));
+            advMenu.showBy(btn.up('#search_form'));
         }
     },
 
     onBodyToolbarClick: function (button) {
         var component = button.findParentByType('search_searchcomponent'),
-            body = component.queryById('searchbody'),
-            options = body.queryById('mainsearchoptions'),
-            results = body.queryById('searchresults'),
-            options_button = component.queryById('optionsbutton'),
-            results_button = component.queryById('resultsbutton');
+            mainsearch = component.queryById('mainsearchoptions'),
+            searchDalsButton = mainsearch.queryById('searchDalsButton'),
+            searchMapButton = mainsearch.queryById('searchMapButton');
 
-        if (body.currentPanel !== 'searchoptions' && button === options_button) {
-            options.show();
-            results.hide();
-            body.currentPanel = 'searchoptions';
+        if (mainsearch.activeItem !== 'searchdals' && button === searchDalsButton){
+            mainsearch.getLayout().setActiveItem('searchdals');
         }
 
-        if (body.currentPanel !== 'results' && button === results_button) {
-            options.hide();
-            results.show();
-            body.currentPanel = 'results';
+        if (mainsearch.activeItem !== 'searchMap' && button === searchMapButton){
+            mainsearch.getLayout().setActiveItem('searchMap');
         }
     },
 
@@ -309,14 +327,29 @@ Ext.define('Savanna.search.controller.SearchComponent', {
             'displayLabel': searchString
         });
 
-        if ((typeof mapView != 'undefined') && mapView &&  mapView.searchLayer) {
+        if ((typeof mapView !== 'undefined') && mapView && mapView.searchLayer) {
             if (mapView.searchLayer.features.length > 0){
                 var polyVo = {};
                 var polyRings = [];
-                var vertices = mapView.searchLayer.features[0].geometry.getVertices();
-                for (var i = 0; i < vertices.length; i++) {
-                    var point = [vertices[i].x, vertices[i].y];
-                    polyRings.push(point);
+                var baseLayer = SavannaConfig.mapDefaultBaseLayer;
+                var searchLayerPolygon = mapView.searchLayer.features[0].geometry.clone();
+                if (baseLayer.projection !== 'EPSG:4326'){
+                    var currentProjection = new OpenLayers.Projection(baseLayer.projection);
+                    var resultsProjection = new OpenLayers.Projection('EPSG:4326');
+                    searchLayerPolygon.transform(currentProjection, resultsProjection);
+                    var vertices = searchLayerPolygon.getVertices();
+                    for (var i = 0; i < vertices.length; i++) {
+                        //polygonVo for solr expects lat, long format
+                        var newPoint = [vertices[i].y, vertices[i].x];
+                        polyRings.push(newPoint);
+                    }
+                } else {
+                    var searchVertices = searchLayerPolygon.getVertices();
+                    for (var j = 0; j < searchVertices.length; j++) {
+                        //polygonVo for solr expects lat, long format
+                        var point = [searchVertices[j].y, searchVertices[j].x];
+                        polyRings.push(point);
+                    }
                 }
                 polyVo.coordinates = [polyRings];
                 polyVo.type = 'Polygon';
@@ -368,7 +401,7 @@ Ext.define('Savanna.search.controller.SearchComponent', {
 
         //supposedly the best way to check for undefined
         //Page size is undefined when view is first opened.
-        if( typeof pageSize == 'undefined')     {
+        if( typeof pageSize === 'undefined')     {
             pageSize = dal.get('resultsPerPage');
         }
 
@@ -380,23 +413,39 @@ Ext.define('Savanna.search.controller.SearchComponent', {
         var resultsDal = component.down('#resultsdals'),
             resultsPanel = component.down('#resultspanel');
 
+        var myCallId = ++this.callId;
+
         resultsStore.proxy.jsonData = Ext.JSON.encode(searchObj.data);  // attach the search request object
         resultsStore.load({
-            callback: Ext.bind(this.searchCallback, this, [resultsDal, resultsPanel, dal.get('id'), resultsStore, action], true)
+            callback: Ext.bind(this.searchCallback, this, [component, resultsDal, resultsPanel, dal.get('id'), resultsStore, action, myCallId], true)
         });
 
-        resultsDal.updateDalStatus(dal.get('id'), 'pending');   // begin in a pending state
+        component.fireEvent('resultsdals:updatestatus', {dalId: dal.get('id'), status: 'pending'});   // begin in a pending state
+
+
+    },
+
+    getSearchTerms: function(elem) {
+        var component = this.getSearchComponent(elem);
+        return component.down('#search_terms');
     },
 
     doSearch: function (elem) {
 
         var component = this.getSearchComponent(elem),
             sources = this.getSelectedDals(component);
-
+            
         this.hideMenu(component);
 
         var searchString = component.queryById('searchbar').buildSearchString(),
             resultsComponent = component.queryById('searchresults');
+        this.getSearchTerms(elem).setValue(searchString); //shows the search string with the advanced terms
+
+
+        var refineTerms = component.down('#refineterms');
+        if (refineTerms) {
+            searchString  =  refineTerms.getRefineSearchString() + searchString;
+        }
 
         var mapView = component.down('#searchMapCanvas');
 
@@ -412,10 +461,9 @@ Ext.define('Savanna.search.controller.SearchComponent', {
          */
 
         var dals = component.down('#searchdals'),
-            resultsDal = component.down('#resultsdals'),
             searchObj;
 
-        resultsDal.createDalPanels(sources);
+        component.fireEvent('resultsdals:createpanels', {sources: sources});
 
         /*
          Check for selected additional Dals, and do a search on each of them
@@ -427,6 +475,20 @@ Ext.define('Savanna.search.controller.SearchComponent', {
                 checked = dals.queryById(dalId).query('checkbox')[0].getValue();    // has this checkbox been selected in search options?
 
             if (checked) {  // checked, or always search the default dal
+
+                /*
+                 clear facet filters, if any
+                 */
+                if (source.get('facetFilterCriteria').length) {
+                    source.set('facetFilterCriteria', []);
+                }
+
+                /*
+                 clear date ranges, if any
+                 */
+                if (source.get('dateTimeRanges').length) {
+                    source.set('dateTimeRanges', []);
+                }
 
                 searchObj = this.buildSearchObject(searchString, source, currentDalPanel, mapView);
 
@@ -440,7 +502,7 @@ Ext.define('Savanna.search.controller.SearchComponent', {
          clear the grid - it's misleading in error states to see results in the grid, even though
          the search request has failed for one reason or another
          */
-        component.down('#resultspanel').updateGridStore({store: Ext.create('Savanna.search.store.SearchResults')});
+        component.down('#resultspanel').clearGridStore();
 
         /*
          show Start New Search button
@@ -487,7 +549,12 @@ Ext.define('Savanna.search.controller.SearchComponent', {
         return customSearchOptions;
     },
 
-    searchCallback: function (records, operation, success, resultsDal, resultsPanel, dalId, store, action) {
+
+    searchCallback: function (records, operation, success, component, resultsDal, resultsPanel, dalId, store, action, callBackId) {
+        //if not the most recent search, ignore the callback
+        if (this.callId !== callBackId){
+            return;
+        }
 
         if (!success) {
             // server down..?
@@ -512,11 +579,27 @@ Ext.define('Savanna.search.controller.SearchComponent', {
             if (action === 'search') {
                 /*
                  add an object tying the dal and store together for referencing
+
+                 We were getting duplicate resultsObjects in the allResultsSet--This is where it happens.  These duplications were causing duplicate facets.
+                 Ideally we would not fire off two searches in a row.
                  */
-                resultsPanel.up('#searchresults').allResultSets.push(resultsObj);
+                var found = false;
+                //replace results if they exist.
+                Ext.each(resultsPanel.up('#searchresults').allResultSets, function (resultset, index) {
+                    if (resultset.id === dalId) {
+                        resultsPanel.up('#searchresults').allResultSets[index] = resultsObj;
+                        found = true;
+                    }
+                });
+
+                //...if not, just add the results.
+                if(!found){
+                    resultsPanel.up('#searchresults').allResultSets.push(resultsObj);
+                }
 
                 if (store.facetValueSummaries !== null) {
-                    resultsDal.createDalFacets(dalId);
+
+                    component.fireEvent('resultsdals:createfacets', {dalId: dalId});
                 }
 
             } else {
@@ -531,33 +614,20 @@ Ext.define('Savanna.search.controller.SearchComponent', {
             }
 
             var statusString = success ? 'success' : 'fail';
-            resultsDal.updateDalStatus(dalId, statusString);
+
+            component.fireEvent('resultsdals:updatestatus', {dalId: dalId, status: statusString});
 
 
             var searchResultsView = resultsPanel.up('#searchresults');
-            if (action === 'search') {
-                if (dalId === Ext.data.StoreManager.lookup('dalSources').defaultId) {
+            if ((action === 'search' && dalId === Ext.data.StoreManager.lookup('dalSources').defaultId) || action === 'filter') {
 
-                    searchResultsView.fireEvent('search:changeSelectedStore', resultsDal.queryById(dalId));
-                }
-            } else {
-                /*
-                 filtering, action set to 'filter'
-                 */
-                searchResultsView.fireEvent('search:changeSelectedStore',  resultsDal.queryById(dalId));
+                searchResultsView.fireEvent('search:changeSelectedStore', resultsDal.queryById(dalId));
             }
         }
     },
 
     showResultsPage: function (component) {
-        var resultsBtn = component.down('#resultsbutton');
-
-        resultsBtn.fireEvent('click', resultsBtn);
-    },
-
-    loadDefaultLayer: function (canvas) {
-        canvas.map.addLayer(new OpenLayers.Layer.WMS(SavannaConfig.mapBaseLayerLabel,
-            SavannaConfig.mapBaseLayerUrl, {layers: SavannaConfig.mapBaseLayerName}));
+        component.down('#searchbody').setActiveTab('searchresults');
     },
 
     loadVectorLayer: function (canvas) {
@@ -565,27 +635,50 @@ Ext.define('Savanna.search.controller.SearchComponent', {
         var searchLayer = new OpenLayers.Layer.Vector('searchLayer');
         searchLayer.events.register('featureadded', canvas, this.onFeatureAdded);
         searchLayer.events.register('featureremoved', canvas, this.onFeatureRemoved);
+        searchLayer.events.register('afterfeaturemodified', canvas, this.onFeatureModified);
         canvas.searchLayer = searchLayer;
         canvas.map.addLayer(searchLayer);
 
-        // Add the draw feature control to the map.
-        var drawFeature = new OpenLayers.Control.DrawFeature(searchLayer, OpenLayers.Handler.Polygon, {
-            id: 'PolygonDrawTool'
-        });
+        canvas.controls = {
+            drawFeature : new OpenLayers.Control.DrawFeature(searchLayer, OpenLayers.Handler.Polygon, {
+                id: 'PolygonDrawTool'
+            }),
+            modifyFeature : new OpenLayers.Control.ModifyFeature(searchLayer,{
+                id: 'ModifyTool',
+                mode: OpenLayers.Control.ModifyFeature.RESHAPE
+            })
+        };
 
-        drawFeature.handler.callbacks.point = this.pointCallback;
-        canvas.map.addControl(drawFeature);
-        canvas.drawFeature = drawFeature;
+        // Add controls to map
+        for(var key in canvas.controls) {
+            if (canvas.controls.hasOwnProperty(key)) {
+                canvas.map.addControl(canvas.controls[key]);
+            }
+        }
+
+        // Adding callback to point handler
+        canvas.controls.drawFeature.handler.callbacks.point = this.pointCallback;
     },
 
-    onFeatureAdded: function (event) {
+    onFeatureAdded: function () {
         // Scope: drawFeature
-        this.drawFeature.deactivate();
-        this.fireEvent('searchPolygonAdded', this);
+        this.controls.drawFeature.deactivate();
+        this.controls.modifyFeature.activate();
+        var resultMap = this.up('search_searchbody').down('#resultMapCanvas');
+        if (resultMap.searchLayer) {
+            this.fireEvent('searchPolygonAdded', this);
+        }
     },
 
-    onFeatureRemoved: function (event) {
+    onFeatureRemoved: function () {
         this.fireEvent('searchPolygonRemoved', this);
+    },
+
+    onFeatureModified: function () {
+        var resultMap = this.up('search_searchcomponent').down('#resultMapCanvas');
+        if (resultMap.searchLayer) {
+            this.fireEvent('searchPolygonAdded', this);
+        }
     },
 
     onMapCanvasResize: function (canvas) {
@@ -602,20 +695,27 @@ Ext.define('Savanna.search.controller.SearchComponent', {
 
     activateDrawFeature: function (button) {
         var canvas = button.up('search_searchmap').down('search_map_canvas');
-        canvas.drawFeature.activate();
+        canvas.controls.drawFeature.activate();
+        canvas.controls.modifyFeature.deactivate();
     },
 
     clearDrawFeature: function (button) {
         var canvas = button.up('search_searchmap').down('search_map_canvas');
         canvas.searchLayer.removeAllFeatures();
-        canvas.drawFeature.deactivate();
+        canvas.controls.drawFeature.deactivate();
     },
+
     zoomToLocation: function (comboBoxButton) {
         var viewBox = comboBoxButton.viewBox;
         var mapCanvas = comboBoxButton.parentComboBox.up('search_searchmap').down('search_map_canvas');
         var extent = new OpenLayers.Bounds(viewBox.west, viewBox.south, viewBox.east, viewBox.north);
+        var baseLayer = SavannaConfig.mapDefaultBaseLayer;
+        if (baseLayer.projection !== 'EPSG:4326'){
+            var currentProjection = new OpenLayers.Projection(baseLayer.projection);
+            var resultsProjection = new OpenLayers.Projection('EPSG:4326');
+            extent.transform(resultsProjection, currentProjection);
+        }
         mapCanvas.map.zoomToExtent(extent, true);
-        console.log(mapCanvas.map.maxExtent);
     },
 
     enableZoomMenu: function (button) {
@@ -650,9 +750,5 @@ Ext.define('Savanna.search.controller.SearchComponent', {
         var canvasSize = searchMap.body.getSize();
         var polyButton = searchMap.down('#drawLocationSearch');
         polyButton.setPosition(canvasSize.width - 50, 10);
-    },
-
-    mapGetSearchResults: function (results, resultsDal) {
-        resultsDal.fireEvent('mapNewSearchResults', results, resultsDal);
     }
 });

@@ -4,7 +4,7 @@ Ext.define('Savanna.search.view.searchComponent.SearchBar', {
     alias: 'widget.search_searchbar',
 
     requires: [
-        'Ext.ux.layout.Center',
+        'Ext.layout.container.HBox',
         'Ext.form.field.Text',
         'Savanna.controller.Factory',
         'Savanna.search.view.searchComponent.searchBar.SearchForm'
@@ -12,34 +12,39 @@ Ext.define('Savanna.search.view.searchComponent.SearchBar', {
 
     border: false,
     frame: false,
-    layout: 'ux.center',
-    cls: 'search-prime',
+    layout: {
+        type: 'hbox',
+        align: 'bottom',
+        pack: 'center'
+    },
+    height: 60,
+    width: '100%',
+    ui: 'search-prime',
 
     items: [
         {
-            xtype: 'panel',
+            xtype: 'container',
             border: false,
-            width: '30%',
+            width: '20%',
             minWidth: 520,
             itemId: 'main_panel',
+            height: 50,
+            layout: {
+                type: 'vbox',
+                align: 'left'
+            },
             items: [
                 {
                     xtype: 'searchbar_form',
-                    itemId: 'search_form'
+                    itemId: 'search_form',
+                    width: '100%',
+                    height: 28
                 },
                 {
-                    xtype: 'panel',
-                    border: false,
-                    bodyPadding: 0,
-                    itemId:'search_reset',
-                    minHeight:25,
-                    items: [
-                        {
-                            xtype: 'button',
-                            itemId:'search_reset_button',
-                            text: 'Start New Search'
-                        }
-                    ]
+                    xtype: 'button',
+                    itemId:'search_reset_button',
+                    ui: 'white',
+                    text: 'Start new search'
                 }
             ]
         }
@@ -50,8 +55,7 @@ Ext.define('Savanna.search.view.searchComponent.SearchBar', {
     },
 
     buildSearchString: function () {
-        var searchString,
-            advancedBooleanString = '',
+        var advancedBooleanString = '',
             formQueryString,
             form = this.queryById('search_form'),
             formContainer = form.queryById('searchadvanced_menu').queryById('form_container');
@@ -64,7 +68,7 @@ Ext.define('Savanna.search.view.searchComponent.SearchBar', {
 
                 var joinString = field.configs.join;
 
-                if (advancedBooleanString === '') {
+                if (advancedBooleanString === '' || field.configs.booleanType === 'none') {
                     joinString = '';
                 }
 
@@ -73,25 +77,13 @@ Ext.define('Savanna.search.view.searchComponent.SearchBar', {
         });
 
         formQueryString = form.queryById('search_terms').getValue().trim();
-        advancedBooleanString = advancedBooleanString.replace(/\s+/g, ' ');
-        searchString = '' + formQueryString;
+        advancedBooleanString = advancedBooleanString.replace(/\s+/g, ' ').trim();
 
-        if (searchString === '') {
-            searchString = advancedBooleanString;
+        if (advancedBooleanString !== '') {
+            return advancedBooleanString;
         } else {
-            if (advancedBooleanString.trim() !== '') {
-                searchString = formQueryString + ' AND ' + advancedBooleanString;
-            } else {
-                searchString = formQueryString;
-            }
+            return '' + formQueryString;
         }
 
-        /*
-        lastly, if the user has specified terms to refine the search in the results screen,
-        add them to the beginning of the searchString
-         */
-        searchString  =  this.findParentByType('search_searchcomponent').refineSearchString + searchString;
-
-        return searchString;
     }
 });

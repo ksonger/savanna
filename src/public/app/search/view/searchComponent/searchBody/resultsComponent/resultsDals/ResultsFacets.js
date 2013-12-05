@@ -13,27 +13,31 @@ Ext.define('Savanna.search.view.searchComponent.searchBody.resultsComponent.resu
         'Savanna.search.controller.resultsComponent.resultsDals.ResultsFacetsController',
         'Savanna.search.view.searchComponent.searchBody.resultsComponent.resultsDals.ResultsFacet'
     ],
-    header: false,
+    // header: false,
     width: '100%',
-
-
+    
     /*
      NOTE: to be replaced with a class attribute I'm sure - this just
      here to get the panel to display for development.
      */
 
-    minHeight:200,
+    // minHeight:200,
 
     initComponent: function () {
         this.callParent(arguments);
     },
 
-    tbar: [
+    tbar: {
+        items: [{
+            xtype: 'tbtext',
+            text: 'FACETS',
+            cls: 'heading3'
+        },
+        '->',
         {
-            xtype: 'button',
             text: 'Show All',
             itemId: 'showHideFacets',
             facetsExpanded:false
         }
-    ]
+    ]}
 });

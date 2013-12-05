@@ -8,7 +8,7 @@
 Ext.define('Savanna.search.view.searchComponent.searchBar.SearchAdvancedTextfield', {
     extend: 'Ext.form.field.Text',
     alias: 'widget.searchadvanced_textfield',
-    width: 355,
+    width: 380,
     fieldLabel: 'All of these words:',
     name: 'all_words',
     enableKeyEvents: true,
@@ -30,7 +30,7 @@ Ext.define('Savanna.search.view.searchComponent.searchBar.SearchAdvancedTextfiel
             case 'any':
                 return str.replace(/\s+/g, ' OR ');
             case 'none':
-                return str.replace(/\s+/g, ' NOT ');
+                return ' NOT ' + str.replace(/\s+/g, ' NOT ');
             default:
                 Ext.Error.raise({
                     msg: 'Unexpected booleanType.'

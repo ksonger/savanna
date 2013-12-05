@@ -1,4 +1,4 @@
-/* global Ext: false, OpenLayers: false, SavannaConfig: false */
+/* global Ext: false, OpenLayers: false, SavannaConfig: false, EventHub: false */
 
 /**
  * Created with IntelliJ IDEA.
@@ -9,7 +9,7 @@
  */
 
 Ext.define('Savanna.search.controller.ResultsComponent', {
-    extend: 'Ext.app.Controller',
+    extend: 'Deft.mvc.ViewController',
 
     views: [
         'Savanna.search.view.searchComponent.searchBody.ResultsComponent'
@@ -18,62 +18,74 @@ Ext.define('Savanna.search.controller.ResultsComponent', {
         'Savanna.controller.Factory'
     ],
 
-    init: function () {
-        var me = this;
-        this.control({
-            'search_resultscomponent': {
-                'render': function (search) {
-                    me.component = search;  // temporary measure, pending deft conversion next week
+    control:    {
 
-                    //Keelan asked that I use UI event bubbling...
-                    //The pattern I've been using is for the controller of the child to fire the event on it's controlled view.
-                    //Then we catch the event in all the "parent controllers" by listening to events on their controlled views. (See below)
-                    me.component.on('Search:PageSizeChanged', this.onPageSizeChange, this);
-                    me.component.on('Search:SortByChanged', this.onSortOrderChange, this);
-                    me.component.on('search:changeSelectedStore', this.changeSelectedStore, this);
-
-                    //grid notifications
-                    me.component.on('search:grid:itemdblclick', this.onItemPreview, this);
-                    me.component.on('search:grid:itemclick', this.onItemClick, this);
-                    me.component.on('search:grid:itemmouseenter', this.onItemMouseEnter, this);
-                    me.component.on('search:grid:itemmouseleave', this.onItemMouseLeave, this);
-
-
-                    //The exception is for popups....
-                    //We can listen for events fired in  a popup this way (just like we did in Flex).
-                    var dispatcher = this.previewWindow();
-                    dispatcher.on('search:previewNextButton', this.onNextItemPreview, this);
-                    dispatcher.on('search:previewPrevButton', this.onPrevItemPreview, this);
-                }
-            },
-
-
-            'search_resultscomponent #resultsFacetsReset': {
-                'click': this.onDalReset
-            },
-            'search_searchcomponent #resultMapCanvas': {
-                beforerender: this.loadDefaultLayer,
-                afterrender: this.loadVectorLayer,
-                resize: this.onMapCanvasResize
-            },
-            'search_searchcomponent #resultspanel button': {
-                click: this.changeResultView
-            },
-            'search_searchcomponent #searchMapCanvas': {
-                searchPolygonAdded: this.addSearchPolygon,
-                searchPolygonRemoved: this.removeSearchPolygon
-            },
-            'search_searchcomponent search_resultsdals': {
-                mapNewSearchResults: this.loadPointsFromStore
+        resultsFacetsReset: {
+            live: true,
+            listeners:  {
+                click: 'onDalReset'
             }
-        });
+        },
+
+        resultMapCanvas: {
+            live:true,
+            listeners:  {
+                afterrender: 'loadVectorLayer',
+                resize: 'onMapCanvasResize'
+            }
+        },
+
+        'resultspanel > button': {
+            live: true,
+            listeners:  {
+                click: 'changeResultView'
+            }
+
+        },
+
+        gridtoolbar: {
+            change: 'gridStoreLoad'
+        },
+
+        searchMapCanvas: {
+            live:true,
+            listeners:  {
+                searchPolygonAdded: 'addSearchPolygon',
+                searchPolygonRemoved: 'removeSearchPolygon'
+            }
+
+        },
+
+        mapResultNext: {
+            click: 'navigateMapResult'
+        },
+
+        mapResultPrev: {
+            click: 'navigateMapResult'
+        },
+
+        openDocButton: {
+            click: 'mapOpenDocument'
+        },
+
+        search_resultscomponent: {
+            live:true,
+            listeners:  {
+                clearPopUpOnNewSearch: 'hidePopUp'
+            }
+
+        }
 
     },
 
+    init: function () {
 
+        this.getView().on('search:PageSizeChanged', this.onPageSizeChange, this);
+        this.getView().on('search:SortByChanged', this.onSortOrderChange, this);
+        this.getView().on('search:changeSelectedStore', this.changeSelectedStore, this);
+        this.getView().on('boxready', this.loadVectorLayer, this)
 
-    //Index to show in preview in range: 0 to store.totalCount.
-    previewIndex: 0,
+    },
 
     //The grid with the results.
     resultsGrid: null,
@@ -81,258 +93,13 @@ Ext.define('Savanna.search.controller.ResultsComponent', {
     //Results store
     resultsStore: null,
 
-    //True if we are waiting for some preview results to show up.
-    _isWaitingForPreviewResults: false,
-
     getResultsComponent: function () {
         return this.component;
-    },
-
-    //True if we are waiting for some preview results to show up.
-    _isWaitingForDocumentMetadata: false,
-
-
-    // Get the grid component.
-    getGrid: function () {
-        return  this.getResultsComponent().down('search_resultspanelgrid');
-    },
-
-    // Get the grid's store.
-    getGridStore: function () {
-        return  this.getGrid().store;
-    },
-
-    //the window that holds the preview content
-    previewWindow: function () {
-        return  this.getResultsComponent().queryById('resultspreviewwindow');
-    },
-
-    //previous button on the preview window
-    previewPrevButton: function () {
-        return this.previewWindow().down('#previewPrevButton');
-    },
-
-    //next button on the preview window
-    previewNextButton: function () {
-        return this.previewWindow().down('#previewNextButton');
-
-    },
-
-    // The 'Preview Results 1 of xxx' label
-    previewIndexAndTotalLabel: function () {
-        return this.previewWindow().down('#itemIndexAndTotalLabel');
     },
 
     getCurrentDalId: function () {
         return this.getResultsComponent().currentResultSet.id;
     },
-
-    getIsWaitingForPreviewResults: function () {
-        return this._isWaitingForPreviewResults;
-    },
-
-    setIsWaitingForPreviewResults: function (value) {
-        this._isWaitingForPreviewResults = value;
-    },
-
-    getIsWaitingForDocumentMetadata: function () {
-        return this._isWaitingForDocumentMetadata;
-    },
-
-    setIsWaitingForDocumentMetadata: function (value) {
-        this._isWaitingForDocumentMetadata = value;
-    },
-
-    //Loads the store based on current store settings
-    getNewPreviewRecords: function () {
-        this.resultsStore = this.getGridStore();
-        var me = this;
-        this.resultsStore.load({
-            scope: this,
-            callback: function() {
-                me.updatePreviewHelper();
-            }
-        });
-    },
-
-    //The store uses an index that is zero-based such that the first record of the current page has index zero (range is 0 to pageSize - 1).
-    // The previewIndex is zero-based but has the range 0 to totalResults - 1.
-    getStoreIndexOfPreviewIndex: function () {
-        return  this.previewIndex % this.resultsStore.pageSize;
-    },
-
-    pageOfCurrentPreviewIndex: function () {
-        if (!this.resultsStore) {
-            this.resultsStore = this.getGridStore();
-        }
-        if (this.previewIndex >= (this.resultsStore.currentPage) * this.resultsStore.pageSize) {
-            return this.resultsStore.currentPage + 1;
-        } else if (this.previewIndex < (this.resultsStore.currentPage - 1) * this.resultsStore.pageSize) {
-            return this.resultsStore.currentPage - 1;
-        }
-        return this.resultsStore.currentPage;
-    },
-
-    updatePreviewHelper: function () {
-
-        var me = Savanna.controller.Factory.getController('Savanna.search.controller.ResultsComponent');
-        me.resultsGrid = me.getGrid();
-        me.resultsStore = me.getGridStore();
-
-        var record = me.resultsStore.getAt(me.getStoreIndexOfPreviewIndex()),
-            recordMetadata;
-
-        if(me.getResultsComponent().currentResultSet.metadata)   {
-            recordMetadata = me.getResultsComponent().currentResultSet.metadata.getById(record.data.uri);
-        }
-
-        //this can happen when you hit next > 10 times/sec
-        if(!record || !recordMetadata){
-            setTimeout(me.updatePreviewHelper, 500);
-            if(!record) {
-                me.setIsWaitingForPreviewResults ( true );
-            }
-            if(!recordMetadata) {
-                me.setIsWaitingForDocumentMetadata ( true );
-            }
-        }
-
-        me.setIsWaitingForPreviewResults ( false );
-
-
-        var win = me.previewWindow();
-        //Show the contents
-        win.displayPreview(record.data, recordMetadata.get('datastore'), me.previewIndex, me.resultsStore.totalCount);
-        //Show the index and total
-        me.previewIndexAndTotalLabel().setText('Preview Result ' + (me.previewIndex + 1) + ' of ' + me.resultsStore.totalCount);
-        //Enable/disable the prev and next buttons
-        if (me.previewIndex === 0) {
-            me.previewPrevButton().disable();
-        } else {
-            me.previewPrevButton().enable();
-        }
-        if (me.previewIndex === me.resultsStore.totalCount - 1) {
-            me.previewNextButton().disable();
-        } else {
-            me.previewNextButton().enable();
-        }
-    },
-
-    getDocumentMetadata: function (results, uris) {
-
-
-        this.setIsWaitingForDocumentMetadata ( true );
-
-        var metadataStore = Ext.create('Savanna.search.store.ResultsMetadata', {
-            storeId: 'searchMetadata_' + results.id,
-            pageSize: results.store.pageSize
-        });
-
-        metadataStore.proxy.jsonData = Ext.JSON.encode(uris);  // attach the metadata request object
-
-        metadataStore.load({
-            callback: Ext.bind(this.metadataCallback, this, [results], true)
-        });
-    },
-
-    metadataCallback: function (records, operation, success, results) {
-
-        for (var record in records) {
-
-            if (records.hasOwnProperty(record)) {
-                var obj = records[record];
-
-                var metaStore = Ext.create('Ext.data.Store', {
-                    model: 'Savanna.search.model.ResultMetadata'
-                });
-                for (var elem in obj.raw) {
-                    if (obj.raw.hasOwnProperty(elem)) {
-                        var elem_obj = obj.raw[elem];
-                        var metaPropertiesStore = Ext.create('Savanna.metadata.store.Metadata');
-                        for (var prop in elem_obj) {
-                            if (elem_obj.hasOwnProperty(prop)) {
-                                metaPropertiesStore.add(elem_obj[prop]);
-                            }
-                        }
-                        metaStore.add({id: elem, datastore: metaPropertiesStore});
-                    }
-                }
-                results.metadata = metaStore;
-
-                this.setIsWaitingForDocumentMetadata ( false );
-            }
-        }
-    },
-
-    updatePreview: function (){
-        this.resultsGrid = this.getGrid();
-        this.resultsStore = this.getGridStore();
-        if(this.getIsWaitingForPreviewResults() || this.getIsWaitingForDocumentMetadata()){
-            return;
-        }
-
-        //Make sure the record is paged in.
-        var containingPage = this.pageOfCurrentPreviewIndex();
-        if (this.resultsStore.currentPage !== containingPage) {
-            this.resultsStore.currentPage = containingPage;
-            this.getNewPreviewRecords();
-        } else {
-
-            this.updatePreviewHelper();
-        }
-    },
-
-    onItemPreview: function (grid, record, node, index) {
-        this.resultsGrid = grid;
-        this.resultsStore = grid.store;
-        //gaaaahhh    the index passed in does not include all the pages that have come before.
-        //gaaaahhh*10 the current page is 1-based.
-        this.previewIndex = index + (this.resultsStore.currentPage - 1) * (this.resultsStore.pageSize);
-        this.updatePreview();
-    },
-
-    onItemMouseEnter: function (view, rec, node) {    // other parameters: , index, e, options
-        if (node) {
-            node.querySelector('#hoverDiv').style.visibility = 'visible';
-        }
-    },
-
-    onItemClick: function (view, rec, node, index, e) {  //other parameter options
-        if (e && e.target && e.target.id) {
-            if (e.target.id === 'openButton') {
-                this.openUri(rec.data.uri);
-            }
-        }
-    },
-
-    onItemMouseLeave: function (view, rec, node) {  // other parameters: , index, e, options
-        if (node) {
-            node.querySelector('#hoverDiv').style.visibility = 'hidden';
-        }
-    },
-
-    openUri: function(){
-        //todo open the uri...
-    },
-
-    onNextItemPreview: function () {
-        if (this.previewIndex >= this.resultsStore.totalCount) {
-            return;
-        } else {
-            this.previewIndex++;
-            this.updatePreview();
-        }
-    },
-
-    onPrevItemPreview: function () {
-        if (this.previewIndex <= 0) {
-            return;
-        } else {
-            this.previewIndex--;
-            this.updatePreview();
-        }
-    },
-
 
     onDalReset: function (btn) {
         var id = this.getCurrentDalId();
@@ -344,9 +111,8 @@ Ext.define('Savanna.search.controller.ResultsComponent', {
         dalRecord.set('dateTimeRanges', []);
         resultsDals.queryById('resultsfacets').removeAll();
         resultsDals.createFacetsTabPanel();
-        btn.findParentByType('search_searchcomponent').refineSearchString = '';
 
-        resultsTerms.queryById('termValues').removeAll();
+        resultsTerms.removeAll();
 
         this.getApplication().fireEvent('results:dalreset', btn);
     },
@@ -367,11 +133,11 @@ Ext.define('Savanna.search.controller.ResultsComponent', {
          'buildSearchObject' needs to return the request object, but when an event is fired it can
          only return a boolean.  If anyone thinks of a way around it, please feel free to update.
          */
-        var searchController = Savanna.controller.Factory.getController('Savanna.search.controller.SearchComponent');
-        var searchComponent = this.getResultsComponent().findParentByType('search_searchcomponent');
-        var currentDalPanel = searchComponent.down('#searchdals').queryById(id);
-        var searchString = searchComponent.queryById('searchbar').buildSearchString();
-        var searchObj = searchController.buildSearchObject(searchString, dalRecord, currentDalPanel);
+        var searchController = Savanna.controller.Factory.getController('Savanna.search.controller.SearchComponent'),
+            searchComponent = this.getResultsComponent().findParentByType('search_searchcomponent'),
+            currentDalPanel = searchComponent.down('#searchdals').queryById(id),
+            searchString = searchComponent.queryById('searchbar').buildSearchString(),
+            searchObj = searchController.buildSearchObject(searchString, dalRecord, currentDalPanel, mapView);
 
         dalRecord.set('resultsPerPage', newSize);
 
@@ -384,7 +150,7 @@ Ext.define('Savanna.search.controller.ResultsComponent', {
      user selects from the left-hand panel, and triggers an update
      of the facets for the newly selected store.
      */
-    changeSelectedStore: function ( dal) {
+    changeSelectedStore: function (dal) {
 
         var component = dal.findParentByType('search_resultscomponent');
 
@@ -402,51 +168,7 @@ Ext.define('Savanna.search.controller.ResultsComponent', {
                 component.down('#resultsPageSizeCombobox').setValue(pageValue);
             }
         });
-    },
 
-    handleSearchTermKeyUp: function (field, evt) {
-
-        if (evt.keyCode === Ext.EventObject.ENTER) {
-            if (field.getValue().trim().length) {
-                field.findParentByType('search_searchcomponent').refineSearchString += (field.getValue() + ' AND ');
-                field.findParentByType('search_searchcomponent').down('#refineterms').addTerm(field);
-
-                /*
-                 resubmit the search request
-                 */
-
-                this.getApplication().fireEvent('results:refineSearch', field);
-                return true;
-
-            }   else    {
-
-                return false;
-            }
-        }
-    },
-
-    handleSearchSubmit: function (btn) {
-        var field = btn.findParentByType('search_resultscomponent').down('#refine_search_terms');
-
-        if (field.getValue().trim().length) {
-            field.findParentByType('search_searchcomponent').refineSearchString += (field.getValue() + ' AND ');
-            field.findParentByType('search_searchcomponent').down('#refineterms').addTerm(field);
-
-            /*
-             resubmit the search request
-             */
-            this.getApplication().fireEvent('results:refineSearch', field);
-            return true;
-
-        }   else    {
-
-            return false;
-        }
-    },
-
-    loadDefaultLayer: function (canvas) {
-        canvas.map.addLayer(new OpenLayers.Layer.WMS(SavannaConfig.mapBaseLayerLabel,
-            SavannaConfig.mapBaseLayerUrl, {layers: SavannaConfig.mapBaseLayerName}));
     },
 
     onMapCanvasResize: function (canvas) {
@@ -454,22 +176,23 @@ Ext.define('Savanna.search.controller.ResultsComponent', {
     },
 
     loadVectorLayer: function (canvas) {
+        console.log('here');
         ////////////////////////////////////////
         //Begin setting up style for result layer
         var colors = {
-            low: 'rgb(181, 226, 140)',
-            middle: 'rgb(241, 211, 87)',
-            high: 'rgb(253, 156, 115)'
+            low: '#B5E28C',
+            middle: '#F1D357',
+            high: '#FD9C73'
         };
 
-        var singleRule =  new OpenLayers.Rule({
+        var singleRule = new OpenLayers.Rule({
             filter: new OpenLayers.Filter.Comparison({
                 type: OpenLayers.Filter.Comparison.EQUAL_TO,
                 property: 'count',
                 value: 1
             }),
             symbolizer: {
-                externalGraphic: './resources/images/mapMarker.png',
+                externalGraphic: './resources/OpenLayers-2.13.1/img/mapMarker.png',
                 graphicWidth: 32,
                 graphicHeight: 32,
                 fillOpacity: 1
@@ -492,9 +215,9 @@ Ext.define('Savanna.search.controller.ResultsComponent', {
                 strokeWidth: 12,
                 pointRadius: 10,
                 label: '${count}',
-                labelOutlineWidth: 1,
-                fontColor: '#ffffff',
-                fontOpacity: 0.8,
+                labelOutlineWidth: 0,
+                fontColor: '#333',
+                fontOpacity: 1,
                 fontSize: '12px'
             }
         });
@@ -513,9 +236,9 @@ Ext.define('Savanna.search.controller.ResultsComponent', {
                 strokeWidth: 12,
                 pointRadius: 15,
                 label: '${count}',
-                labelOutlineWidth: 1,
-                fontColor: '#ffffff',
-                fontOpacity: 0.8,
+                labelOutlineWidth: 0,
+                fontColor: '#333',
+                fontOpacity: 1,
                 fontSize: '12px'
             }
         });
@@ -533,9 +256,9 @@ Ext.define('Savanna.search.controller.ResultsComponent', {
                 strokeWidth: 12,
                 pointRadius: 20,
                 label: '${count}',
-                labelOutlineWidth: 1,
-                fontColor: '#ffffff',
-                fontOpacity: 0.8,
+                labelOutlineWidth: 0,
+                fontColor: '#333',
+                fontOpacity: 1,
                 fontSize: '12px'
             }
         });
@@ -555,31 +278,53 @@ Ext.define('Savanna.search.controller.ResultsComponent', {
         });
         canvas.searchLayer = searchLayer;
         canvas.map.addLayers([searchLayer, canvas.resultsLayer]);
+
+        canvas.controls = {
+            hoverFeature: new OpenLayers.Control.SelectFeature(
+                canvas.resultsLayer, {hover: true}
+            )
+        };
+
+        // Add controls to map
+        for (var key in canvas.controls) {
+            if (canvas.controls.hasOwnProperty(key)) {
+                canvas.map.addControl(canvas.controls[key])
+            }
+        }
+
+        /* This checks to see if the searchMap exists and then fire
+         the event to add the search polygon
+         */
+        if (canvas.up('search_searchcomponent').down('searchMapCanvas')) {
+            var searchMap = canvas.up('search_searchcomponent').down('searchMapCanvas');
+            searchMap.fireEvent('searchPolygonAdded', this);
+        }
     },
 
     changeResultView: function (button) {
         var mapPanel = button.up('search_resultscomponent').down('#resultsmap');
         var resultsGridPanel = button.up('search_resultscomponent').down('#resultspanelgrid');
-        switch (button.text){
-            case 'Map':
+        switch (button.itemId) {
+            case 'results_mapViewButton':
                 resultsGridPanel.hide();
                 mapPanel.show();
                 break;
-            case 'List':
+            case 'results_listViewButton':
                 mapPanel.hide();
                 resultsGridPanel.show();
                 break;
         }
-
     },
+
     addSearchPolygon: function (canvas) {
         var searchLayer = canvas.searchLayer;
+
         //modify resultmap searchLayer to match searchmap searchLayer
-        if(searchLayer.features.length > 0){
+        if (searchLayer.features.length > 0) {
             var resultMap = canvas.up('search_searchcomponent').down('#resultMapCanvas');
             var layerFeatureArray = searchLayer.features;
-            resultMap.searchLayer.removeAllFeatures();
             var cloneFeature = layerFeatureArray[0].clone();
+            resultMap.searchLayer.removeAllFeatures();
             resultMap.searchLayer.addFeatures(cloneFeature);
         }
     },
@@ -587,33 +332,225 @@ Ext.define('Savanna.search.controller.ResultsComponent', {
     removeSearchPolygon: function (canvas) {
         var resultMap = canvas.up('search_searchcomponent').down('#resultMapCanvas');
         //clear all features
-        if (resultMap.searchLayer.features.length > 0){
+        if (resultMap.searchLayer.features.length > 0) {
             resultMap.searchLayer.removeAllFeatures();
         }
     },
 
-    loadPointsFromStore: function (results, scope) {
-        var searchResults = results.store.data.items;
-        var searchResultList = [];
-        for (var i = 0; i < searchResults.length; i++) {
-            var attributes = {};
-            attributes.title = searchResults[i].data.title;
-            attributes.previewString = searchResults[i].data.previewString;
-            attributes.contentDocUri = searchResults[i].data.contentDocUri;
-            var resultPoints = searchResults[i].data.latLonPairs;
-            if (resultPoints !== null) {
-                for (var j = 0; j < resultPoints.length; j++) {
-                    attributes.name = resultPoints[j].name;
-                    searchResultList.push(new OpenLayers.Feature.Vector(new OpenLayers.Geometry.Point(resultPoints[j].longitude, resultPoints[j].latitude), attributes));
-                }
-            }
-        }
-        var mapCanvas = scope.up('search_searchcomponent').down('#resultMapCanvas');
+    loadPointsFromStore: function (grid) {
+        var mapCanvas = this.getResultMapCanvas();
         if (mapCanvas.resultsLayer.features.length > 0) {
             mapCanvas.resultsLayer.removeAllFeatures();
         }
+        var searchResults = grid.store.data.items;
+        var searchResultList = [];
+        for (var i = 0; i < searchResults.length; i++) {
+            var resultPoints = searchResults[i].data.latLonPairs;
+            if (resultPoints !== null) {
+                var baseLayer = SavannaConfig.mapDefaultBaseLayer;
+                var currentProjection,
+                    resultsProjection;
+                var transform = false;
+                var uniqueResults = {};
+
+                /*
+                 Check to see if the projection of the base layer is EPSG:4326. Convert vector layer otherwise.
+                 */
+
+                if (baseLayer.projection != 'EPSG:4326') {
+                    currentProjection = new OpenLayers.Projection(baseLayer.projection);
+                    resultsProjection = new OpenLayers.Projection("EPSG:4326");
+                    transform = true;
+                }
+
+                /*
+                 Eliminate duplicate points
+                 */
+
+                for (var j = 0; j < resultPoints.length; j++) {
+                    var uriKey = searchResults[i].data.uri + "_" + resultPoints[j].name;
+                    //if the unique uri_location exits
+                    if (uniqueResults[uriKey]) {
+                        uniqueResults[uriKey].count += 1;
+                    } else {
+                        uniqueResults[uriKey] = {
+                            'count': 1,
+                            'title': searchResults[i].data.title,
+                            'uri': searchResults[i].data.uri,
+                            'contentType': searchResults[i].data.contentType,
+                            'previewString': searchResults[i].data.previewString,
+                            'name': resultPoints[j].name,
+                            'publishedDate': searchResults[i].data.publishedDate,
+                            'composite': searchResults[i].data.composite,
+                            'fileType': searchResults[i].data.fileType,
+                            'latitude': resultPoints[j].latitude,
+                            'longitude': resultPoints[j].longitude
+                        }
+                    }
+                }
+
+                /*
+                 Push the new vector point to the to the searchResultList Array
+                 */
+
+                for (var key in uniqueResults) {
+                    if (uniqueResults.hasOwnProperty(key)) {
+                        var newItem = uniqueResults[key];
+                        var newPoint = new OpenLayers.LonLat(newItem.longitude, newItem.latitude);
+                        if (transform) {
+                            newPoint.transform(resultsProjection, currentProjection)
+                        }
+                        searchResultList.push(new OpenLayers.Feature.Vector(new OpenLayers.Geometry.Point(newPoint.lon, newPoint.lat), {
+                            'title': newItem.title,
+                            'previewString': newItem.previewString,
+                            'contentType': newItem.contentType,
+                            'uri': newItem.uri,
+                            'composite': newItem.composite,
+                            'publishedDate': newItem.publishedDate,
+                            'fileType': newItem.fileType,
+                            'name': newItem.name
+                        }));
+                    }
+                }
+
+            }
+        }
         mapCanvas.resultsLayer.addFeatures(searchResultList);
 
-    }
+        if (mapCanvas.resultsLayer.events.listeners.featureselected) {
+            mapCanvas.resultsLayer.events.listeners.featureselected = null;
+            mapCanvas.resultsLayer.events.listeners.featureunselected = null;
+        }
 
+        mapCanvas.controls.hoverFeature.activate();
+        mapCanvas.resultsLayer.events.register('featureselected', null, Ext.bind(this.displayMapPopUp, this, [mapCanvas], true));
+        mapCanvas.resultsLayer.events.register('featureunselected', null, Ext.bind(this.hidePopUp, this, [mapCanvas], true));
+
+    },
+
+    displayMapPopUp: function (event, mapCanvas) {
+        var featurePopUp = mapCanvas.up('search_resultsmap').down('#featurePopUp');
+        var featureLocation = event.feature.geometry;
+        this.setPopUpTemplate(event, featurePopUp, this);
+        featurePopUp.show();
+        this.position(featurePopUp, mapCanvas, featureLocation);
+    },
+
+    hidePopUp: function (event, scope) {
+        var featurePopUp = scope.up('search_searchcomponent').down('#featurePopUp');
+        featurePopUp.down('#mapResultPrev').disable();
+        featurePopUp.down('#mapResultNext').disable();
+        featurePopUp.hide();
+    },
+
+    setPopUpTemplate: function (event, featurePopUp, controller) {
+        featurePopUp.store = event.feature.cluster;
+        featurePopUp.currentIndex = 0;
+        controller.setPopUpContent(featurePopUp);
+    },
+
+    position: function (featurePopUp, mapCanvas, featureLocation) {
+        //define the position that the popup window and assign class to popup anchor
+        var locationPx = mapCanvas.map.getPixelFromLonLat(new OpenLayers.LonLat(featureLocation.x, featureLocation.y));
+        var dom = Ext.dom.Query.select('.popUpAnchor');
+        var popUpAnchor = Ext.get(dom[0]);
+        popUpAnchor.removeCls("top left right bottom");
+        var mapBox = mapCanvas.getBox(true);
+        var shift;
+        var top = null;
+        var left = null;
+        var ancLeft = null;
+        var ancTop = null;
+        var elSize = featurePopUp.el.getSize();
+
+        var horizontalOffset = (locationPx.x > mapBox.width / 2) ? 'right' : 'left';
+        var verticalOffset = (locationPx.y > mapBox.height / 2) ? 'bottom' : 'top';
+        popUpAnchor.addCls(horizontalOffset);
+        popUpAnchor.addCls(verticalOffset);
+        var anchorSize = popUpAnchor.getSize();
+
+        if (horizontalOffset === 'right') {
+            left = locationPx.x - elSize.width;
+            if (left < 0) {
+                shift = Math.abs(locationPx.x - elSize.width) + 5;
+                left = left + shift;
+                ancLeft = elSize.width - anchorSize.width - shift;
+            } else {
+                ancLeft = elSize.width - anchorSize.width;
+            }
+        } else {
+            left = locationPx.x;
+            if (left + elSize.width > mapBox.width) {
+                shift = (left + elSize.width + 5) - (mapBox.width);
+                left = left - shift;
+                ancLeft = 0 + shift;
+            } else {
+                ancLeft = 0;
+            }
+        }
+        if (verticalOffset === 'bottom') {
+            top = locationPx.y - (elSize.height + anchorSize.height);
+            ancTop = elSize.height;
+        } else {
+            top = locationPx.y + anchorSize.height;
+            ancTop -= anchorSize.height;
+        }
+        //Set the position of the feature popup panel and the popup anchor
+        featurePopUp.setPosition(left, top);
+        popUpAnchor.setLeftTop(ancLeft, ancTop);
+    },
+
+    navigateMapResult: function (button) {
+        //var me = Savanna.controller.Factory.getController('Savanna.search.controller.ResultsComponent');
+        var featurePopUp = button.up('search_featurepopup');
+        if (featurePopUp.currentIndex <= featurePopUp.store.length - 1) {
+            featurePopUp.currentIndex += (button.direction === 'next') ? 1 : -1;
+        }
+        this.setPopUpContent(featurePopUp);
+
+    },
+
+    setPopUpContent: function (featurePopUp) {
+        var data = featurePopUp.store[featurePopUp.currentIndex].data;
+        featurePopUp.down('#popup-index-count').setText('Result ' + (featurePopUp.currentIndex + 1) + ' of ' + featurePopUp.store.length);
+        featurePopUp.down('#popup-title').setText(this.parseTitle(data.title));
+        featurePopUp.down('#popup-location-text').setText('Location: ' + data.name);
+        featurePopUp.down('#popup-preview-text').setText(data.composite + ' - ' + this.parseDate(new Date(data.publishedDate)) + ' - ' + data.fileType + ' - ' + data.previewString + '...');
+        featurePopUp.update(featurePopUp.store[featurePopUp.currentIndex]);
+        featurePopUp.down('#mapResultPrev').setDisabled((featurePopUp.currentIndex <= 0));
+        featurePopUp.down('#mapResultNext').setDisabled((featurePopUp.currentIndex >= featurePopUp.store.length - 1));
+        featurePopUp.updateLayout();
+    },
+
+    parseDate: function (v) {
+        return Ext.Date.format(new Date(v), 'F d, Y');
+    },
+
+    parseTitle: function (v) {
+        var title = "";
+        if (v) {
+            title = (v.length > 40) ? v.substring(0, 40) + "..." : v;
+        }
+        return title;
+    },
+
+    mapOpenDocument: function (button) {
+        var documentDetails = this.getPopupDocumentRecord(button);
+        EventHub.fireEvent('open', documentDetails);
+    },
+
+    getPopupDocumentRecord: function (button) {
+        var featurePopUp = button.up('search_featurepopup');
+        var uri = featurePopUp.store[featurePopUp.currentIndex].data.uri;
+        var contentType = featurePopUp.store[featurePopUp.currentIndex].data.contentType;
+        var title = featurePopUp.store[featurePopUp.currentIndex].data.title;
+        return {uri: uri, type: contentType, label: title}
+    },
+
+    gridStoreLoad: function (grid) {
+        //var me = Savanna.controller.Factory.getController('Savanna.search.controller.ResultsComponent');
+        var event = null;
+        this.hidePopUp(event, grid);
+        this.loadPointsFromStore(grid);
+    }
 });

@@ -2,11 +2,10 @@
  * TODO: Document what events we may emit...
  */
 Ext.define('Savanna.search.view.searchComponent.SearchBody', {
-    extend: 'Ext.panel.Panel',
+    extend: 'Ext.tab.Panel',
     alias: 'widget.search_searchbody',
 
     requires: [
-        'Ext.tab.Panel',
         'Savanna.search.view.searchComponent.searchBody.SearchDals',
         'Savanna.search.view.searchComponent.searchBody.SearchMap',
         'Savanna.search.view.searchComponent.searchBody.ResultsComponent',
@@ -16,84 +15,76 @@ Ext.define('Savanna.search.view.searchComponent.SearchBody', {
          requires, the console complains that the controller has had to be loaded
          asynchronously.  Maybe because results is in a tab that has not been rendered..?
           */
-        'Savanna.search.controller.ResultsComponent',
+        //'Savanna.search.controller.ResultsComponent',
 
         'Savanna.controller.Factory'
     ],
 
     layout: 'fit',
-    border: false,
-    currentPanel: 'searchoptions',
-
+    tabBar:{
+        ui: 'search-prime-tabs'
+    },
     items: [
         {
-            xtype: 'panel',
-            layout: 'border',
+            title: 'Search Options',
+            layout: 'card',
             itemId: 'mainsearchoptions',
-            border: false,
+            tabConfig: {
+                ui: 'search-prime-tabs'
+            },
             items: [
                 {
-                    xtype: 'tabpanel',
-                    cls: 'flat-tab',
-                    border: false,
-                    itemId: 'mainsearchtabpanel',
-                    activeTab: 0,
-                    flex: 3,
-                    anchor: '100% 100%',
-                    tabPosition: 'top',
-                    region: 'center',
-                    items: [
-                        {
-                            title: 'Search Sources',
-                            autoScroll: true,
-                            cls: 'search-dal',
-                            itemId:'searchdals',
-                            xtype: 'search_searchdals'
-                        },
-                        {
-                            title: 'Location',
-                            itemId: 'searchMap',
-                            xtype: 'search_searchmap'
-                        }
-                    ]
-                }
-            ]
-
-        },
-        {
-            xtype: 'search_resultscomponent',
-            layout: 'border',
-            itemId: 'searchresults'
-        }
-    ],
-
-    dockedItems: [
-        {
-            xtype: 'toolbar',
-            width: '100%',
-            itemId: 'searchbodytoolbar',
-            items: [
-                {
-                    xtype: 'button',
-                    text: 'Search Options',
-                    itemId: 'optionsbutton'
+                    autoScroll: true,
+                    cls: 'search-dal',
+                    itemId:'searchdals',
+                    xtype: 'search_searchdals'
                 },
                 {
-                    xtype: 'button',
-                    text: 'Results',
-                    itemId: 'resultsbutton'
+                    itemId: 'searchMap',
+                    xtype: 'search_searchmap'
                 }
-            ]
-        }
-    ],
-    bbar: [
-        '->',
-        {
-            xtype: 'button',
-            ui: 'commit',
-            scale: 'large',
-            text: 'Search',
-            itemId: 'toolbarsearchbutton'
+            ],
+ 
+            tbar: {
+                ui: 'light-toolbar',
+                defaults: {
+                    ui: 'toggle',
+                    toggleGroup: 'search-options',
+                    allowDepress: false
+                },
+                items: [{
+                    text: 'Search Sources',
+                    itemId: 'searchDalsButton',
+                    width: 92,
+                    pressed: true
+                }, { 
+                    xtype: 'tbseparator' 
+                }, {
+                    text: 'Location Search',
+                    itemId: 'searchMapButton'
+                }]},
+            bbar: {
+                ui: 'dark-toolbar',
+                cls: 'toolbar-paddingSmall',
+                items: [
+                '->', {
+                        xtype: 'button',
+                        ui: 'commit',
+                       
+                        scale: 'large',
+                        text: 'Search',
+                        itemId: 'toolbarsearchbutton'
+                    }
+            ]}
+        }, {
+            xtype: 'search_resultscomponent',
+            layout: 'border',
+            itemId: 'searchresults',
+            title: 'Search Results',
+
+            tabConfig: {
+                ui: 'search-prime-tabs'
+            }
         }
     ]
 });

@@ -32,6 +32,8 @@ Ext.define('Savanna.search.model.SearchResult', {
         {name: 'publishedDate', type: 'int'},
         {name: 'entityCounts', type: 'array'},
         {name: 'isRead', type: 'boolean'},
-        {name: 'metadata', type: 'array'}
+        {name: 'metadata', type: 'array'},
+        'contentType',
+        'contentSubType'
     ]
 });

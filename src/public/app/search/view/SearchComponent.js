@@ -25,7 +25,6 @@ Ext.define('Savanna.search.view.SearchComponent', {
     closable:false,
     border:false,
 
-
     items: [
         {
             xtype: 'search_searchbar',
@@ -39,17 +38,7 @@ Ext.define('Savanna.search.view.SearchComponent', {
         }
     ],
 
-    dockedItems: [
-        {
-            xtype: 'search_searchtoolbar',
-            itemId: 'searchtoolbar'
-        }
-    ],
-
     initComponent: function () {
-
-        this.refineSearchString = '';
-
         this.callParent(arguments);
 
         Savanna.controller.Factory.getController('Savanna.search.controller.SearchComponent');

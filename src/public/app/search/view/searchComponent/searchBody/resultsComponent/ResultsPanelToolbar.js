@@ -2,28 +2,22 @@ Ext.define('Savanna.search.view.searchComponent.searchBody.resultsComponent.Resu
     extend: 'Ext.toolbar.Toolbar',
     alias: 'widget.search_resultspaneltoolbar',
     controller: 'Savanna.search.controller.resultsComponent.ResultsPanelToolbarController',
-    bubbleEvents: ['Search:PageSizeChanged', "Search:SortByChanged"],
+    bubbleEvents: ['Search:PageSizeChanged', 'Search:SortByChanged'],
     requires: [
         'Savanna.controller.Factory',
         'Ext.form.field.ComboBox',
         'Ext.data.Store',
         'Savanna.search.controller.resultsComponent.ResultsPanelToolbarController'
     ],
-
+    height: 33,
     initComponent: function () {
         Savanna.controller.Factory.getController('Savanna.search.controller.SearchComponent');
         this.items = this.setupItems();
         this.callParent(arguments);
     },
 
-    setupItems:function()   {
+    setupItems: function () {
 
-        var sortStore = Ext.create('Ext.data.Store', {
-            fields: ['sortby', 'name'],
-            data: [
-                {'sortby': 'relevance', 'name': 'Sort by Relevance'}
-            ]
-        });
 
         var countStore = Ext.create('Ext.data.Store', {
             fields: ['count', 'name'],
@@ -34,16 +28,8 @@ Ext.define('Savanna.search.view.searchComponent.searchBody.resultsComponent.Resu
             ]
         });
 
-        return [{
-                xtype: 'combobox',
-                itemId: 'resultsSortByCombobox',
-                store: sortStore,
-                displayField: 'name',
-                valueField: 'sortby',
-                value: 'relevance',
-                editable: false,
-                ui: 'combo-button'
-            }, {
+        return [
+            {
                 xtype: 'combobox',
                 itemId: 'resultsPageSizeCombobox',
                 store: countStore,
@@ -51,17 +37,36 @@ Ext.define('Savanna.search.view.searchComponent.searchBody.resultsComponent.Resu
                 valueField: 'count',
                 value: 'Results per page',
                 editable: false,
-                ui: 'combo-button'
-
-            }, {
-                xtype: 'tbfill'
-            }, {
-                text:'Imgs'
-            }, {
-                text:'List'
-            }, {
-                text:'Map'
-        }]
+                width: 150
+            },
+            '->',
+            {
+                xtype: 'pagingtoolbar',
+                cls: 'paging-toolbar-bg',
+                itemId: 'gridtoolbar',
+                dock: 'top',
+                displayInfo: true
+            },
+            '->',
+            {
+                xtype: 'button',
+                glyph: 'list',
+                itemId: 'results_listViewButton',
+                width: 25,
+                height: 25,
+                cls: 'toolbarButtonFramework',
+                tooltip: 'View search results as a list'
+            },
+            {
+                xtype: 'button',
+                glyph: 'earth',
+                itemId: 'results_mapViewButton',
+                width: 25,
+                height: 25,
+                cls: 'toolbarButtonFramework',
+                tooltip: 'View search results on a map'
+            }
+        ]
     }
 
 });

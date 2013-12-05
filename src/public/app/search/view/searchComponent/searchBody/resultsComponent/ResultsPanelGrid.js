@@ -8,16 +8,11 @@
 Ext.define('Savanna.search.view.searchComponent.searchBody.resultsComponent.ResultsPanelGrid', {
     extend: 'Ext.grid.Panel',
     alias: 'widget.search_resultspanelgrid',
-    bubbleEvents: [
-        'search:grid:itemdblclick',
-        'search:grid:itemclick',
-        'search:grid:itemmouseenter',
-        'search:grid:itemmouseleave'
-    ],
     controller: 'Savanna.search.controller.resultsComponent.ResultsPanelGridController',
 
     requires: [
         'Savanna.search.controller.resultsComponent.ResultsPanelGridController',
+        'Ext.grid.plugin.DragDrop',
         'Ext.grid.column.Template',
         'Ext.XTemplate'
     ],
@@ -31,46 +26,43 @@ Ext.define('Savanna.search.view.searchComponent.searchBody.resultsComponent.Resu
     columns: [
         {
             text: ' ',
+            hideable: false,
             xtype: 'templatecolumn',
             tpl: new Ext.XTemplate(
-
                 '<div style="position: relative" >',
-                '<div id="hoverDiv" style="visibility: hidden; right: 0;  top: 5; position: absolute;" ><button class="openButtonClass">Open</button></div>',
-                '<table>',
-                '<tr><td colspan="2" class="grid-cell-title"><strong>{title}</strong></td></tr>',
-                '<td><img src="{documentSource}" width="80px" height="60px" /></td>',
-                '<td>({composite}) - {[this.parseDate(new Date(values.publishedDate))]} - {documentFileName}<br />{previewString}</td>',
-                '</table>',
+                '<div class="resultDiv">',
+
+                '{[this.getImgDiv(values)]}',
+                '<div class="grid-cell-title"><strong class="openClass">{title}</strong></div>',
+                '<div class="contentDiv">({composite}) - {[this.parseDate(new Date(values.publishedDate))]} - {documentFileName}<br />{previewString}</div>',
+                '</div>',
                 '</div>',
                 {
                     parseDate: function (v) {
                         return Ext.Date.format(new Date(v), 'F d, Y');
+                    },
+                    getImgDiv: function (record) {
+                        var result = '';
+                        if (record.contentType === 'Image') {
+                            result = '<div class="sourceDiv" ><img src="' + record.documentSource + '"/></div>';
+                        }
+                        return result;
                     }
                 }
             )
         }
     ],
 
-    header: false,
-    forceFit: true,
-
-    initComponent: function () {
-        this.callParent(arguments);
-    },
-
-    onStoreLoad: function () {
-
-        var controller = Savanna.controller.Factory.getController('Savanna.search.controller.ResultsComponent'),
-            component = this.findParentByType('search_resultscomponent'),
-            metadataArray = [];
-
-        if (component.currentResultSet) {
-
-            Ext.each(component.currentResultSet.store.data.items, function (record) {
-                metadataArray.push(record.get('uri'));
-            });
-
-            controller.getDocumentMetadata(component.currentResultSet, metadataArray);
+    viewConfig: {
+        plugins: {
+            dragGroup: 'SEARCH-ITEMS',
+            ptype: 'gridviewdragdrop',
+            enableDrop: false,
+            enableDrag: true
         }
-    }
+    },
+    hideHeaders: true,
+    header: false,
+    forceFit: true
+
 });
