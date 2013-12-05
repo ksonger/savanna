@@ -1,3 +1,10 @@
+/**
+ * Created with IntelliJ IDEA.
+ * User: ksonger
+ * Date: 8/16/13
+ * Time: 2:32 PM
+ * To change this template use File | Settings | File Templates.
+ */
 Ext.define('Savanna.search.model.dalSource.CustomSearchParameter', {
     extend: 'Ext.data.Model',
 

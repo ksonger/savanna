@@ -14,7 +14,7 @@ Ext.define("Savanna.flexpaper.controller.FlexpaperComponent", {
         "Savanna.flexpaper.view.FlexpaperEntityWindow"
     ],
 
-    onToolSelect:function (btn, evt) {
+    onToolSelect:function (btn) {
         var viewerId = btn.up("flexpaper_flexpapercomponent").docViewId;
         if (btn.itemId == "toolmenu")   {
             Ext.each(btn.menu.items.items, function (item)
@@ -35,7 +35,7 @@ Ext.define("Savanna.flexpaper.controller.FlexpaperComponent", {
             }
         }
     },
-    init: function (app) {
+    init: function () {
         this.control({
             "flexpaper_flexpapertoolbar > #tools button": {
                 click: this.onToolSelect

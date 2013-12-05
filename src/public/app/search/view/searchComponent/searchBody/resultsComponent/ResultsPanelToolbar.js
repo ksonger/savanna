@@ -1,3 +1,10 @@
+/**
+ * Created with IntelliJ IDEA.
+ * User: ksonger
+ * Date: 8/8/13
+ * Time: 1:19 PM
+ * To change this template use File | Settings | File Templates.
+ */
 Ext.define('Savanna.search.view.searchComponent.searchBody.resultsComponent.ResultsPanelToolbar', {
     extend: 'Ext.toolbar.Toolbar',
     alias: 'widget.search_resultspaneltoolbar',

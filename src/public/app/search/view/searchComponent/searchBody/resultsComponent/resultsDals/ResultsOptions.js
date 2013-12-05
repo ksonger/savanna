@@ -1,3 +1,10 @@
+/**
+ * Created with IntelliJ IDEA.
+ * User: ksonger
+ * Date: 9/13/13
+ * Time: 11:44 AM
+ * To change this template use File | Settings | File Templates.
+ */
 Ext.define('Savanna.search.view.searchComponent.searchBody.resultsComponent.resultsDals.ResultsOptions', {
     extend: 'Ext.button.Button',
     alias: 'widget.search_resultsDals_resultsoptions',

@@ -5,7 +5,6 @@
  * Time: 11:44 AM
  * To change this template use File | Settings | File Templates.
  */
-/* global Ext: false */
 Ext.define('Savanna.search.view.searchComponent.searchBody.resultsComponent.resultsDals.ResultsRefineTerms', {
     extend: 'Ext.container.Container',
     alias: 'widget.search_resultsDals_resultsterms',
